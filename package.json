@@ -18,3 +18,4 @@
         "generate": "ts-node --transpile-only src/schema.ts"
         }
     }
+    

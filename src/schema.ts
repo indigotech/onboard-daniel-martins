@@ -9,3 +9,4 @@ export const schema = makeSchema({
         typegen: join(process.cwd(), "nexus-typegen.ts")
         }
     })
+    

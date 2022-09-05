@@ -4,13 +4,16 @@ Getting acquainted with basic server development (CRUD data in a db), utilizing 
 This is an onboarding project with the overarching goals of getting used to our technology stack, patterns and best practices, such as Vincent Driessen's branching model, rebasing as a core principle of organizing version control and other company conventions. 
 
 ## Environment and tools *
+- Node v14.12.0
 
-## Steps to run and debug 
-# Getting the server up:
-- Typing the command "npm run dev" on the terminal at the project directory will get the server running at http://localhost:3000/ (Apollo Studio)
-- The command "npm run generate" executed under the same conditions will regenerate the schema.graphql and nexus-typegen.ts files created by nexus in case of types not getting updated properly
-# Valid queries:
-- A query with a hello field, in the format displayed below, shall return a "Hello World!" from the server
+## Steps to run and debug
+### Installing necessary dependencies:
+- Type "npm install" to get all dependencies needed to run the server.
+### Getting the server up:
+- Typing the command "npm run dev" on the terminal at the project directory will get the server running at http://localhost:3000/ (Apollo Studio).
+- The command "npm run generate" executed under the same conditions will regenerate the schema.graphql and nexus-typegen.ts files created by nexus in case of types not getting updated properly.
+### Valid queries:
+- A query with a hello field, in the format displayed below, shall return a "Hello World!" from the server.
 
 ```
 query ExampleQuery {
