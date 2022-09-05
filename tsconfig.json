@@ -1,0 +1,14 @@
+{
+    "compilerOptions": {
+      "target": "ES2018", //Indicates JS version to which JS features should be downleveled to 
+      "module": "commonjs", //Sets the module system for program (commonjs for most node projects)
+      "lib": [
+        "esnext"
+      ],
+      "strict": true, //Enables a wide range of type checking behavior that results in more type-safe programs
+      "rootDir": ".",
+      "outDir": "dist",
+      "sourceMap": true, //Enables generation of sourcemap files, which allow debuggers/other tools to display the original TS code when working with emitted JS files
+      "esModuleInterop": true
+    }
+  }
