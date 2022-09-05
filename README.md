@@ -6,5 +6,14 @@ This is an onboarding project with the overarching goals of getting used to our 
 ## Environment and tools *
 
 ## Steps to run and debug 
+# Getting the server up:
 - Typing the command "npm run dev" on the terminal at the project directory will get the server running at http://localhost:3000/ (Apollo Studio)
 - The command "npm run generate" executed under the same conditions will regenerate the schema.graphql and nexus-typegen.ts files created by nexus in case of types not getting updated properly
+# Valid queries:
+- A query with a hello field, in the format displayed below, shall return a "Hello World!" from the server
+
+```
+query ExampleQuery {
+  hello
+}
+```
