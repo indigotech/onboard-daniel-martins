@@ -5,6 +5,7 @@ This is an onboarding project with the overarching goals of getting used to our 
 
 ## Environment and tools *
 - Node v14.12.0
+- Typescript v4.8.2
 
 ## Steps to run and debug
 ### Installing necessary dependencies:
@@ -20,3 +21,5 @@ query ExampleQuery {
   hello
 }
 ```
+
+- Adding new queries is as simple as adding the new query fields under the "server.ts" constant "typeDefs" and their respective resolver functions under "resolvers" in the same file, following typical GraphQL formatting.
