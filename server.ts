@@ -1,4 +1,5 @@
 import { ApolloServer } from 'apollo-server';
+import 'reflect-metadata';
 
 const typeDefs = `
   type Query {
