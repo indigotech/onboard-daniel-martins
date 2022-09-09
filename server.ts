@@ -22,22 +22,42 @@ const typeDefs = `
   }
 
   type Mutation {
-    createUser(userData: UserInput): UserOutput
+    createUser(userData: UserInput): UserOutput!
   }
 
 `;
+
+interface CreateUserInput {
+  userData: UserInput;
+}
+
+interface UserInput {
+  name: string;
+  email: string;
+  password: string;
+  birthDate: string;
+}
+
+interface UserOutput {
+  name: string;
+  email: string;
+  id: number;
+  birthDate: string;
+}
 
 const resolvers = {
   Query: {
     hello: () => `Hello World!`,
   },
   Mutation: {
-    createUser(args) {
-      return args;
+    createUser(_: unknown, args: CreateUserInput): UserOutput {
+      return {
+        id: 1,
+        name: args.userData.name,
+        email: args.userData.email,
+        birthDate: args.userData.birthDate,
+      };
     },
-  },
-  UserOutput: {
-    id: () => 1,
   },
 };
 
