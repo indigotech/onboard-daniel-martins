@@ -14,10 +14,9 @@
       "typeorm": "0.3.9"
    },
    "scripts": {
-      "tsc": "tsc",
       "dev": "ts-node-dev --transpile-only --no-notify --exit-child server.ts",
       "start": "ts-node src/index.ts",
-      "build": "npm run tsc -- --esModuleInterop server.ts",
+      "build": "tsc --esModuleInterop server.ts",
       "typeorm": "typeorm-ts-node-commonjs"
    },
    "devDependencies": {

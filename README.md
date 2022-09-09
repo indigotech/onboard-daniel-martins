@@ -21,5 +21,6 @@ This is an onboarding project with the overarching goals of getting used to our 
 
 ### Editing the local and test databases:
 - Both databases are initially created through Docker containers, defined in docker-compose.yml. Editing the file allows you to set the superuser username and password, as well as changing database names.
+- To create both databases, type the command "docker-compose up -d" on the project root with Docker running on your computer.
 - After they've been created, you can edit them with ease through either code with TypeORM or some database editing software (TablePlus, PopSQL).
 - Adding new queries is as simple as adding the new query fields under the "server.ts" constant "typeDefs" and their respective resolver functions under "resolvers" in the same file, following typical GraphQL formatting.
