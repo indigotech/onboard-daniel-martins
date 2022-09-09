@@ -6,8 +6,7 @@
          "es5",
          "es6"
       ],
-      "strict": true,
-      "strictPropertyInitialization": false,
+      "strict": false,
       "moduleResolution": "node",
       "outDir": "./build",
       "emitDecoratorMetadata": true,
