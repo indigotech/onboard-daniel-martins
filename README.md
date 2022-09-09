@@ -16,7 +16,7 @@ This is an onboarding project with the overarching goals of getting used to our 
 - Type "npm install" to get all dependencies needed to run the server from the package.json.
 
 ### Getting the server up:
-- Typing the command "npm run dev" on the terminal at the project directory will get the server running at http://localhost:3000/ (Apollo Studio) by executing server.ts through ts-node.
+- Typing the command "npm run start" on the terminal at the project directory will get the server running at http://localhost:3000/ (Apollo Studio) by executing server.ts through ts-node.
 - Alternatively, typing "npm run build" will compile server.ts into its JS equivalent, allowing the usage of "node server.js" instead.
 
 ### Editing the local and test databases:

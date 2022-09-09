@@ -10,7 +10,7 @@ export const AppDataSource = new DataSource({
   password: 'taq1234',
   database: 'local-data',
   synchronize: true,
-  logging: true,
+  logging: false,
   entities: [User],
   migrations: [],
   subscribers: [],
