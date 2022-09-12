@@ -29,7 +29,7 @@ export const resolvers = {
       user.name = args.userData.name;
       user.email = args.userData.email;
 
-      const hash = createHmac('sha256', 'davytautas');
+      const hash = createHmac('sha256', 'internalizing server behavior');
       user.password = hash.update(args.userData.password).digest('hex');
       user.birthDate = args.userData.birthDate;
 
