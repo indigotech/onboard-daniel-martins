@@ -16,6 +16,8 @@ export async function startServer(isMain = false) {
     server.listen({ port }).then(({ url }) => {
       console.log(`Your server is present at ${url}`);
     });
+  } else {
+    server.listen({ port });
   }
 }
 
