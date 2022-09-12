@@ -3,10 +3,8 @@ import 'reflect-metadata';
 import { typeDefs, resolvers } from './schema';
 import { AppDataSource } from './src/data-source';
 
-export function startServer() {
-  AppDataSource.initialize()
-    .then(async () => console.log('Database connection estabilished'))
-    .catch((error) => console.log(error));
+export async function startServer(isMain = false) {
+  await AppDataSource.initialize().catch((error) => console.log(error));
 
   const server = new ApolloServer({
     typeDefs,
@@ -14,9 +12,14 @@ export function startServer() {
   });
 
   const port = 3000;
-  server.listen({ port }).then(({ url }) => {
-    console.log(`Your server is present at ${url}`);
-  });
+  if (isMain) {
+    server.listen({ port }).then(({ url }) => {
+      console.log(`Your server is present at ${url}`);
+    });
+  }
 }
 
-startServer();
+if (require.main === module) {
+  const isMain = true;
+  startServer(isMain);
+}
