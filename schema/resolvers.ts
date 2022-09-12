@@ -1,6 +1,7 @@
 import { CreateUserInput, UserInput, UserOutput } from './interfaces';
 import { User } from '../src/entity/User';
 import { AppDataSource } from '../src/data-source';
+import { SHA256 } from './SHA-256';
 
 const userRepo = AppDataSource.getRepository(User);
 
@@ -27,7 +28,7 @@ export const resolvers = {
       const user = new User();
       user.name = args.userData.name;
       user.email = args.userData.email;
-      user.password = args.userData.password;
+      user.password = SHA256(args.userData.password);
       user.birthDate = args.userData.birthDate;
 
       await validateInput(args.userData);
