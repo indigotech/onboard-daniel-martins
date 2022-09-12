@@ -1,7 +1,7 @@
 import { CreateUserInput, UserInput, UserOutput } from './interfaces';
 import { User } from '../src/entity/User';
 import { AppDataSource } from '../src/data-source';
-import { SHA256 } from './SHA-256';
+import { createHash } from 'crypto';
 
 const userRepo = AppDataSource.getRepository(User);
 
@@ -28,7 +28,9 @@ export const resolvers = {
       const user = new User();
       user.name = args.userData.name;
       user.email = args.userData.email;
-      user.password = SHA256(args.userData.password);
+
+      const hash = createHash('sha256');
+      user.password = hash.update(args.userData.password).digest('hex');
       user.birthDate = args.userData.birthDate;
 
       await validateInput(args.userData);
