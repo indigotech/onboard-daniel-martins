@@ -17,6 +17,6 @@ services:
     volumes:
       - ./db/dumps:/app-db-dumps
     environment:
-      - POSTGRES_USER=pick_a_username
-      - POSTGRES_PASSWORD=pick_a_password
-      - POSTGRES_DB=pick_a_db_name
+      - POSTGRES_USER=db-test
+      - POSTGRES_PASSWORD=testingnewtactics
+      - POSTGRES_DB=test-data
