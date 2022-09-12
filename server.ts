@@ -3,7 +3,6 @@ import 'reflect-metadata';
 import { typeDefs, resolvers } from './schema';
 import { AppDataSource } from './src/data-source';
 
-//Initializes database connection
 AppDataSource.initialize()
   .then(async () => console.log('Database connection estabilished'))
   .catch((error) => console.log(error));

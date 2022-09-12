@@ -1,8 +1,22 @@
-import { CreateUserInput, UserOutput } from './interfaces';
+import { CreateUserInput, UserInput, UserOutput } from './interfaces';
 import { User } from '../src/entity/User';
 import { AppDataSource } from '../src/data-source';
 
 const userRepo = AppDataSource.getRepository(User);
+
+async function validateInput(userData: UserInput) {
+  const validatePW = new RegExp('^(?=.*[A-Za-z])(?=.*\\d).{6,}$');
+  if (validatePW.test(userData.password) == false) {
+    throw new Error(
+      'Password must be at least 6 characters long. Password must have at least one letter and one digit.',
+    );
+  }
+
+  const emailCount = await userRepo.findAndCountBy({ email: userData.email });
+  if (emailCount[1] >= 1) {
+    throw new Error('Email address already in use.');
+  }
+}
 
 export const resolvers = {
   Query: {
@@ -11,26 +25,14 @@ export const resolvers = {
   Mutation: {
     async createUser(_: unknown, args: CreateUserInput): Promise<UserOutput> {
       const user = new User();
-
-      console.log('Inserting a new user into the database...');
       user.name = args.userData.name;
       user.email = args.userData.email;
       user.password = args.userData.password;
       user.birthDate = args.userData.birthDate;
+
+      await validateInput(args.userData);
       await userRepo.save(user);
-      console.log(user.name, user.id, user.email, user.password, user.birthDate);
-      console.log('Saved a new user with id: ' + user.id);
-
-      //console.log('Loading users from the database...');
-      //const users = await userRepo.find();
-      //console.log('Loaded users: ', users);
-
-      return {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        birthDate: user.birthDate,
-      };
+      return user;
     },
   },
 };
