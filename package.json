@@ -15,18 +15,21 @@
    },
    "scripts": {
       "start": "ts-node-dev --transpile-only --no-notify --exit-child server.ts",
+      "test": "mocha -r ts-node/register 'test/*.ts'",
       "build": "tsc --esModuleInterop server.ts",
       "typeorm": "typeorm-ts-node-commonjs"
    },
    "devDependencies": {
+      "@types/mocha": "9.1.1",
       "@types/node": "16.11.10",
       "@typescript-eslint/eslint-plugin": "5.36.2",
       "@typescript-eslint/parser": "5.36.2",
       "eslint": "8.23.0",
       "eslint-config-prettier": "8.5.0",
       "eslint-plugin-prettier": "4.2.1",
+      "mocha": "10.0.0",
       "prettier": "2.7.1",
-      "typescript": "4.5.2",
-      "ts-node": "10.7.0"
+      "ts-node": "10.7.0",
+      "typescript": "4.5.2"
    }
 }
