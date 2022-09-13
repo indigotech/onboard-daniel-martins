@@ -13,4 +13,5 @@ export async function startServer() {
 
   const port = 3000;
   await server.listen({ port });
+  console.log(`Your server is present at http://localhost:3000/`);
 }
