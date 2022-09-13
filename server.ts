@@ -1,9 +1,10 @@
 import { ApolloServer } from 'apollo-server';
 import 'reflect-metadata';
 import { typeDefs, resolvers } from './schema';
-import { AppDataSource } from './src/data-source';
+import { AppDataSource, dataSourceSetup } from './src/data-source';
 
 export async function startServer() {
+  dataSourceSetup();
   await AppDataSource.initialize();
 
   const server = new ApolloServer({

@@ -1,13 +1,13 @@
 import axios from 'axios';
 import { expect } from 'chai';
 import * as dotenv from 'dotenv';
-dotenv.config({ path: './test.env' });
 import { startServer } from '../server';
 
 const endpoint = 'http://localhost:3000/';
 
 describe('Array', function () {
   before('starting server', async function () {
+    dotenv.config({ path: './test.env' });
     await startServer();
   });
 

@@ -1,8 +1,9 @@
 import { CreateUserInput, UserInput, UserOutput } from './interfaces';
 import { User } from '../src/entity/User';
-import { AppDataSource } from '../src/data-source';
+import { AppDataSource, dataSourceSetup } from '../src/data-source';
 import { createHmac } from 'crypto';
 
+dataSourceSetup();
 const userRepo = AppDataSource.getRepository(User);
 
 async function validateInput(userData: UserInput) {
