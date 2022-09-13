@@ -19,3 +19,8 @@ export function dataSourceSetup() {
     subscribers: [],
   });
 }
+
+export async function clearDB() {
+  const userRepo = AppDataSource.getRepository(User);
+  await userRepo.query('DROP TABLE "user"');
+}

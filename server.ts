@@ -3,10 +3,12 @@ import 'reflect-metadata';
 import { typeDefs, resolvers } from './schema';
 import { AppDataSource, dataSourceSetup } from './src/data-source';
 
-export async function startServer() {
+export async function startDB() {
   dataSourceSetup();
   await AppDataSource.initialize();
+}
 
+export async function startServer() {
   const server = new ApolloServer({
     typeDefs,
     resolvers,
