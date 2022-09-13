@@ -3,7 +3,7 @@ import 'reflect-metadata';
 import { typeDefs, resolvers } from './schema';
 import { AppDataSource } from './src/data-source';
 
-export async function startServer(isMain = false) {
+export async function startServer() {
   await AppDataSource.initialize().catch((error) => console.log(error));
 
   const server = new ApolloServer({
@@ -12,16 +12,5 @@ export async function startServer(isMain = false) {
   });
 
   const port = 3000;
-  if (isMain) {
-    server.listen({ port }).then(({ url }) => {
-      console.log(`Your server is present at ${url}`);
-    });
-  } else {
-    server.listen({ port });
-  }
-}
-
-if (require.main === module) {
-  const isMain = true;
-  startServer(isMain);
+  server.listen({ port });
 }
