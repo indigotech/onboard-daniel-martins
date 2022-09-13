@@ -1,4 +1,3 @@
-import 'mocha';
 import { startServer } from '../server';
 import axios from 'axios';
 import { expect } from 'chai';
