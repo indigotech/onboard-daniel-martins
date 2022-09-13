@@ -3,16 +3,15 @@ import 'reflect-metadata';
 import { typeDefs, resolvers } from './schema';
 import { AppDataSource } from './src/data-source';
 
-AppDataSource.initialize()
-  .then(async () => console.log('Database connection estabilished'))
-  .catch((error) => console.log(error));
+export async function startServer() {
+  await AppDataSource.initialize();
 
-const server = new ApolloServer({
-  typeDefs,
-  resolvers,
-});
+  const server = new ApolloServer({
+    typeDefs,
+    resolvers,
+  });
 
-const port = 3000;
-server.listen({ port }).then(({ url }) => {
-  console.log(`Your server is present at ${url}`);
-});
+  const port = 3000;
+  await server.listen({ port });
+  console.log(`Your server is present at http://localhost:3000/`);
+}

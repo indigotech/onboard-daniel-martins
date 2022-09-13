@@ -21,7 +21,7 @@ async function validateInput(userData: UserInput) {
 
 export const resolvers = {
   Query: {
-    hello: () => `Hello World!`,
+    hello: () => `Hello, Taqtiler!`,
   },
   Mutation: {
     async createUser(_: unknown, args: CreateUserInput): Promise<UserOutput> {
