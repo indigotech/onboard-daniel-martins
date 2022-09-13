@@ -1,6 +1,8 @@
-import { startServer } from '../server';
 import axios from 'axios';
 import { expect } from 'chai';
+import * as dotenv from 'dotenv';
+dotenv.config({ path: './test.env' });
+import { startServer } from '../server';
 
 const endpoint = 'http://localhost:3000/';
 
