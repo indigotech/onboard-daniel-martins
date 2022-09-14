@@ -21,6 +21,5 @@ export function dataSourceSetup() {
 }
 
 export async function clearDB() {
-  const userRepo = AppDataSource.getRepository(User);
-  await userRepo.query('DROP TABLE "user"');
+  await AppDataSource.query('TRUNCATE TABLE "user" RESTART IDENTITY');
 }

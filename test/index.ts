@@ -1,51 +1,191 @@
-<<<<<<< HEAD
 import axios from 'axios';
 import { expect } from 'chai';
 import * as dotenv from 'dotenv';
 import { startServer } from '../server';
-=======
-import * as dotenv from 'dotenv';
-dotenv.config({ path: './test.env' });
-import { startServer, startDB } from '../server';
 import { AppDataSource, clearDB } from '../src/data-source';
->>>>>>> fa55550 (Added createUser tests for valid inputs)
-
-import { validTest, shortPW, letterPW, numberPW, repeatEmail } from './createUser';
+import { User } from '../src/entity/User';
 
 export const endpoint = 'http://localhost:3000/';
+function defaultInput() {
+  return {
+    name: 'Bob Semple',
+    email: 'bobsemple@gmail.com',
+    password: 'pass1234',
+    birthDate: '01-01-1990',
+  };
+}
 
-describe('Array', function () {
-  before('starting server', async function () {
-    dotenv.config({ path: './test.env' });
-    await startServer();
+before(async () => {
+  dotenv.config({ path: './test.env' });
+  await startServer();
+});
+
+after(async () => {
+  await AppDataSource.destroy();
+});
+
+afterEach(async () => {
+  await clearDB();
+});
+
+it('should return user data back from the server', async () => {
+  const userRepo = AppDataSource.getRepository(User);
+  const userInput = defaultInput();
+
+  const validQuery = {
+    operationName: 'validQuery',
+    query: `mutation validQuery ($userInput: UserInput!) { createUser(userData: $userInput) {
+            name,
+            email,
+            birthDate
+            id
+          }
+        }`,
+    variables: {
+      userInput: userInput,
+    },
+  };
+
+  const response = await axios({
+    url: endpoint,
+    method: 'post',
+    data: validQuery,
   });
 
-  beforeEach('starting database', async function () {
-    await startDB();
+  const expectedResponse = {
+    data: {
+      createUser: {
+        name: 'Bob Semple',
+        email: 'bobsemple@gmail.com',
+        birthDate: '01-01-1990',
+        id: 1,
+      },
+    },
+  };
+
+  const expectedEntry = {
+    id: 1,
+    name: 'Bob Semple',
+    email: 'bobsemple@gmail.com',
+    password: '67e0ff225304e04db922ef3a55a205afe7cebb48ad239e7d86a09f1b364f3a92',
+    birthDate: '01-01-1990',
+  };
+
+  expect(response.data).to.be.deep.eq(expectedResponse);
+  expect(await userRepo.findOneBy({ id: 1 })).to.be.deep.eq(expectedEntry);
+});
+
+it('should refuse short passwords', async () => {
+  const userInput = defaultInput();
+  userInput.password = 'a1';
+
+  const shortPassword = {
+    operationName: 'shortPassword',
+    query: `mutation shortPassword ($userInput: UserInput!) { createUser(userData: $userInput) {
+            name,
+            email,
+            birthDate
+            id
+          }
+        }`,
+    variables: {
+      userInput: userInput,
+    },
+  };
+
+  const response = await axios({
+    url: endpoint,
+    method: 'post',
+    data: shortPassword,
   });
 
-  afterEach('clears database', async function () {
-    await clearDB();
-    await AppDataSource.destroy();
+  const expectedResponse =
+    'Password must be at least 6 characters long. Password must have at least one letter and one digit.';
+
+  expect(response.data.errors[0].message).to.be.deep.eq(expectedResponse);
+});
+
+it('should refuse passwords without numbers', async () => {
+  const userInput = defaultInput();
+  userInput.password = 'abcdef';
+
+  const letterPassword = {
+    operationName: 'letterPassword',
+    query: `mutation letterPassword ($userInput: UserInput!) { createUser(userData: $userInput) {
+            name
+          }
+        }`,
+    variables: {
+      userInput: userInput,
+    },
+  };
+
+  const response = await axios({
+    url: endpoint,
+    method: 'post',
+    data: letterPassword,
   });
 
-  it('should get user data back from the server', async function () {
-    await validTest(); // Checks server response for a typical valid user input
+  const expectedResponse =
+    'Password must be at least 6 characters long. Password must have at least one letter and one digit.';
+
+  expect(response.data.errors[0].message).to.be.deep.eq(expectedResponse);
+});
+
+it('should refuse passwords without letters', async () => {
+  const userInput = defaultInput();
+  userInput.password = '123456';
+
+  const numberPassword = {
+    operationName: 'numberPassword',
+    query: `mutation numberPassword ($userInput: UserInput!) { createUser(userData: $userInput) {
+            name
+          }
+        }`,
+    variables: {
+      userInput: userInput,
+    },
+  };
+
+  const response = await axios({
+    url: endpoint,
+    method: 'post',
+    data: numberPassword,
   });
 
-  it('should refuse short passwords', async function () {
-    await shortPW(); // Checks server response for password shorter than 6 characters
+  const expectedResponse =
+    'Password must be at least 6 characters long. Password must have at least one letter and one digit.';
+
+  expect(response.data.errors[0].message).to.be.deep.eq(expectedResponse);
+});
+
+it('should refuse emails already in database', async () => {
+  const userInput = defaultInput();
+
+  const emailUser = {
+    operationName: 'emailUser',
+    query: `mutation emailUser ($userInput: UserInput!) { createUser(userData: $userInput) {
+            name
+          }
+        }`,
+    variables: {
+      userInput: userInput,
+    },
+  };
+
+  await axios({
+    url: endpoint,
+    method: 'post',
+    data: emailUser,
   });
 
-  it('should refuse passwords without numbers', async function () {
-    await letterPW(); // Checks server response for letter-only password
+  const response = await axios({
+    url: endpoint,
+    method: 'post',
+    data: emailUser,
   });
 
-  it('should refuse passwords without letters', async function () {
-    await numberPW(); // Checks server response for nunmber-only password
-  });
+  const expectedResponse = 'Email address already in use.';
 
-  it('should refuse emails already in database', async function () {
-    await repeatEmail();
-  });
+  expect(response.data.errors[0].message).to.be.deep.eq(expectedResponse);
 });

@@ -18,7 +18,7 @@
    "scripts": {
       "dev": "ts-node-dev --transpile-only --no-notify --exit-child index.ts",
       "start": "node server.js",
-      "test": "mocha -r ts-node/register test/index.ts",
+      "test": "mocha --exit -r ts-node/register test/index.ts",
       "build": "tsc --esModuleInterop server.ts",
       "typeorm": "typeorm-ts-node-commonjs"
    },

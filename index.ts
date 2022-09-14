@@ -1,6 +1,5 @@
 import * as dotenv from 'dotenv';
-import { startServer, startDB } from './server';
+import { startServer } from './server';
 
 dotenv.config();
-startDB();
 startServer();
