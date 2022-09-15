@@ -1,8 +1,8 @@
 import axios from 'axios';
 import { expect } from 'chai';
 import * as dotenv from 'dotenv';
-import { UserInput } from '../schema/interfaces';
-import { startServer } from '../server';
+import { UserInput } from '../src/schema/interfaces';
+import { startServer } from '../src/server';
 import { AppDataSource, clearDB } from '../src/data-source';
 import { User } from '../src/entity/User';
 
@@ -97,10 +97,17 @@ describe('createUser mutation tests', async () => {
       data: shortPassword,
     });
 
-    const expectedResponse =
-      'Password must be at least 6 characters long. Password must have at least one letter and one digit.';
+    const expectedResponse = {
+      errors: [
+        {
+          message: 'Password must be at least 6 characters long. Password must have at least one letter and one digit.',
+          code: 400,
+        },
+      ],
+      data: null,
+    };
 
-    expect(response.data.errors[0].message).to.be.deep.eq(expectedResponse);
+    expect(response.data).to.be.deep.eq(expectedResponse);
   });
 
   it('should refuse passwords without numbers', async () => {
@@ -120,10 +127,17 @@ describe('createUser mutation tests', async () => {
       data: letterPassword,
     });
 
-    const expectedResponse =
-      'Password must be at least 6 characters long. Password must have at least one letter and one digit.';
+    const expectedResponse = {
+      errors: [
+        {
+          message: 'Password must be at least 6 characters long. Password must have at least one letter and one digit.',
+          code: 400,
+        },
+      ],
+      data: null,
+    };
 
-    expect(response.data.errors[0].message).to.be.deep.eq(expectedResponse);
+    expect(response.data).to.be.deep.eq(expectedResponse);
   });
 
   it('should refuse passwords without letters', async () => {
@@ -143,10 +157,17 @@ describe('createUser mutation tests', async () => {
       data: numberPassword,
     });
 
-    const expectedResponse =
-      'Password must be at least 6 characters long. Password must have at least one letter and one digit.';
+    const expectedResponse = {
+      errors: [
+        {
+          message: 'Password must be at least 6 characters long. Password must have at least one letter and one digit.',
+          code: 400,
+        },
+      ],
+      data: null,
+    };
 
-    expect(response.data.errors[0].message).to.be.deep.eq(expectedResponse);
+    expect(response.data).to.be.deep.eq(expectedResponse);
   });
 
   it('should refuse emails already in database', async () => {
@@ -170,8 +191,17 @@ describe('createUser mutation tests', async () => {
       data: emailUser,
     });
 
-    const expectedResponse = 'Email address already in use.';
+    const expectedResponse = {
+      errors: [
+        {
+          message: 'Email address already in use, please use another one or log in to your account.',
+          code: 400,
+          additionalInfo: 'Inputted email address is already bound to an existing user in data source.',
+        },
+      ],
+      data: null,
+    };
 
-    expect(response.data.errors[0].message).to.be.deep.eq(expectedResponse);
+    expect(response.data).to.be.deep.eq(expectedResponse);
   });
 });
