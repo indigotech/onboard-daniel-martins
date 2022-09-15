@@ -3,6 +3,7 @@ import { User } from '../entity/User';
 import { AppDataSource } from '../data-source';
 import { createHmac } from 'crypto';
 import { CustomError } from '../format-error';
+import * as jwt from 'jsonwebtoken';
 
 export function hashString(str: string) {
   const hash = createHmac('sha256', 'internalizing server behavior');
@@ -40,6 +41,11 @@ async function validateInput(userData: UserInput) {
   }
 }
 
+async function createToken(user: User) {
+  const token = jwt.sign({ userID: user.id }, 'Understanding how to fly into w@ll5');
+  return token;
+}
+
 export const resolvers = {
   Query: {
     hello: () => `Hello, Taqtiler!`,
@@ -62,6 +68,14 @@ export const resolvers = {
     async login(_: unknown, args: LoginUserInput): Promise<LoginOutput> {
       const userRepo = AppDataSource.getRepository(User);
 
+      if (!args.loginData.email || !args.loginData.password) {
+        throw new CustomError(
+          'Please type both your email and your password for login.',
+          400,
+          'Either the email or the password fields were empty on server request.',
+        );
+      }
+
       const user = await userRepo.findOneBy({
         email: args.loginData.email,
         password: hashString(args.loginData.password),
@@ -75,9 +89,11 @@ export const resolvers = {
         );
       }
 
+      const token = await createToken(user);
+
       return {
         user: user,
-        token: 'the_token',
+        token: token,
       };
     },
   },
