@@ -2,10 +2,7 @@ import axios from 'axios';
 import { expect } from 'chai';
 import { AppDataSource, clearDB } from '../src/data-source';
 import { User } from '../src/entity/User';
-
-const endpoint = 'http://localhost:3000/';
-
-let loginInput;
+import { hash, endpoint, defaultUser } from './index';
 
 const loginQuery = `
   mutation loginQuery($loginInput: LoginInput!) {
@@ -20,6 +17,8 @@ const loginQuery = `
     }
   }
 `;
+
+let loginInput;
 
 describe('login mutation tests', async () => {
   before(async () => {
@@ -42,7 +41,6 @@ describe('login mutation tests', async () => {
 
   it('should return user data back from the server', async () => {
     const userRepo = AppDataSource.getRepository(User);
-
     const validQuery = {
       operationName: 'loginQuery',
       query: loginQuery,
@@ -68,15 +66,13 @@ describe('login mutation tests', async () => {
         },
       },
     };
-
     const expectedEntry = {
-      id: 1,
-      name: 'Bob Semple',
-      email: 'bobsemple@gmail.com',
-      password: '474d57b79c3cab2a4af8bf92c788a41601efae9e17dff9ef0fe86430016857cf',
-      birthDate: 'Yesterday',
-    };
-
+        id: 1,
+        name: loginInput.name,
+        email: loginInput.email,
+        password: hash.update(loginInput.password).digest('hex'),
+        birthDate: loginInput.birthDate,
+      };
     expect(response.data).to.be.deep.eq(expectedResponse);
     expect(await userRepo.findOneBy({ id: 1 })).to.be.deep.eq(expectedEntry);
   });
@@ -105,9 +101,9 @@ describe('login mutation tests', async () => {
       ],
       data: null,
     };
-
     expect(response.data).to.be.deep.eq(expectedResponse);
   });
+
   it('should refuse requests with missing email', async () => {
     loginInput.email = '';
     const badQuery = {
@@ -132,7 +128,6 @@ describe('login mutation tests', async () => {
       ],
       data: null,
     };
-
     expect(response.data).to.be.deep.eq(expectedResponse);
   });
   it('should refuse requests with missing password', async () => {
@@ -159,7 +154,6 @@ describe('login mutation tests', async () => {
       ],
       data: null,
     };
-
     expect(response.data).to.be.deep.eq(expectedResponse);
   });
 });

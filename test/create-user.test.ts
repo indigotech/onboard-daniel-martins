@@ -2,36 +2,32 @@ import axios from 'axios';
 import { expect } from 'chai';
 import { AppDataSource, clearDB } from '../src/data-source';
 import { User } from '../src/entity/User';
+import { hash, endpoint, defaultUser } from './index';
 
-const endpoint = 'http://localhost:3000/';
+const createUserQuery = `mutation createUserQuery ($userInput: UserInput!) { createUser(userData: $userInput) {
+    name,
+    email,
+    birthDate
+    id
+  }
+}`
 
-function defaultInput() {
-  return {
-    name: 'Bob Semple',
-    email: 'bobsemple@gmail.com',
-    password: 'pass1234',
-    birthDate: '01-01-1990',
-  };
-}
+let userInput;
 
 describe('\ncreateUser mutation tests', async () => {
+  beforeEach(async () => {
+    userInput = defaultUser;
+  })
+
   afterEach(async () => {
     await clearDB();
   });
 
   it('should return user data back from the server', async () => {
     const userRepo = AppDataSource.getRepository(User);
-    const userInput = defaultInput();
-
     const validQuery = {
-      operationName: 'validQuery',
-      query: `mutation validQuery ($userInput: UserInput!) { createUser(userData: $userInput) {
-              name,
-              email,
-              birthDate
-              id
-            }
-          }`,
+      operationName: 'createUserQuery',
+      query: createUserQuery,
       variables: {
         userInput: userInput,
       },
@@ -46,39 +42,32 @@ describe('\ncreateUser mutation tests', async () => {
     const expectedResponse = {
       data: {
         createUser: {
-          name: 'Bob Semple',
-          email: 'bobsemple@gmail.com',
-          birthDate: '01-01-1990',
+          name: userInput.name,
+          email: userInput.email,
+          birthDate: userInput.birthDate,
           id: 1,
         },
       },
     };
-
     const expectedEntry = {
       id: 1,
-      name: 'Bob Semple',
-      email: 'bobsemple@gmail.com',
-      password: '67e0ff225304e04db922ef3a55a205afe7cebb48ad239e7d86a09f1b364f3a92',
-      birthDate: '01-01-1990',
+      name: userInput.name,
+      email: userInput.email,
+      password: hash.update(userInput.password).digest('hex'),
+      birthDate: userInput.birthDate,
     };
-
     expect(response.data).to.be.deep.eq(expectedResponse);
     expect(await userRepo.findOneBy({ id: 1 })).to.be.deep.eq(expectedEntry);
   });
 
   it('should refuse short passwords', async () => {
-    const userInput = defaultInput();
     userInput.password = 'a1';
-
     const shortPassword = {
-      operationName: 'shortPassword',
-      query: `mutation shortPassword ($userInput: UserInput!) { createUser(userData: $userInput) {
-              name
-            }
-          }`,
-      variables: {
-        userInput: userInput,
-      },
+        operationName: 'createUserQuery',
+        query: createUserQuery,
+        variables: {
+          userInput: userInput,
+        },
     };
 
     const response = await axios({
@@ -96,23 +85,17 @@ describe('\ncreateUser mutation tests', async () => {
       ],
       data: null,
     };
-
     expect(response.data).to.be.deep.eq(expectedResponse);
   });
 
   it('should refuse passwords without numbers', async () => {
-    const userInput = defaultInput();
     userInput.password = 'abcdef';
-
     const letterPassword = {
-      operationName: 'letterPassword',
-      query: `mutation letterPassword ($userInput: UserInput!) { createUser(userData: $userInput) {
-              name
-            }
-          }`,
-      variables: {
-        userInput: userInput,
-      },
+        operationName: 'createUserQuery',
+        query: createUserQuery,
+        variables: {
+          userInput: userInput,
+        },
     };
 
     const response = await axios({
@@ -130,23 +113,17 @@ describe('\ncreateUser mutation tests', async () => {
       ],
       data: null,
     };
-
     expect(response.data).to.be.deep.eq(expectedResponse);
   });
 
   it('should refuse passwords without letters', async () => {
-    const userInput = defaultInput();
     userInput.password = '123456';
-
     const numberPassword = {
-      operationName: 'numberPassword',
-      query: `mutation numberPassword ($userInput: UserInput!) { createUser(userData: $userInput) {
-              name
-            }
-          }`,
-      variables: {
-        userInput: userInput,
-      },
+        operationName: 'createUserQuery',
+        query: createUserQuery,
+        variables: {
+          userInput: userInput,
+        },
     };
 
     const response = await axios({
@@ -164,22 +141,16 @@ describe('\ncreateUser mutation tests', async () => {
       ],
       data: null,
     };
-
     expect(response.data).to.be.deep.eq(expectedResponse);
   });
 
   it('should refuse emails already in database', async () => {
-    const userInput = defaultInput();
-
     const emailUser = {
-      operationName: 'emailUser',
-      query: `mutation emailUser ($userInput: UserInput!) { createUser(userData: $userInput) {
-              name
-            }
-          }`,
-      variables: {
-        userInput: userInput,
-      },
+        operationName: 'createUserQuery',
+        query: createUserQuery,
+        variables: {
+          userInput: userInput,
+        },
     };
 
     await axios({
@@ -204,7 +175,6 @@ describe('\ncreateUser mutation tests', async () => {
       ],
       data: null,
     };
-
     expect(response.data).to.be.deep.eq(expectedResponse);
   });
 });

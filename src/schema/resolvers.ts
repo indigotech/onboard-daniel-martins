@@ -4,6 +4,8 @@ import { AppDataSource } from '../data-source';
 import { createHmac } from 'crypto';
 import { CustomError } from '../format-error';
 
+export const hash = createHmac('sha256', 'internalizing server behavior');
+
 async function validateInput(userData: UserInput) {
   const userRepo = AppDataSource.getRepository(User);
   const validatePW = new RegExp('^(?=.*[A-Za-z])(?=.*\\d).{6,}$');
@@ -35,7 +37,6 @@ export const resolvers = {
       user.name = args.userData.name;
       user.email = args.userData.email;
 
-      const hash = createHmac('sha256', 'internalizing server behavior');
       user.password = hash.update(args.userData.password).digest('hex');
       user.birthDate = args.userData.birthDate;
 
