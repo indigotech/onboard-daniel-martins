@@ -77,7 +77,7 @@ describe('createUser mutation tests', async () => {
     };
 
     expect(response.data).to.be.deep.eq(expectedResponse);
-    expect(await userRepo.findOneBy({ id: 1 })).to.be.deep.eq(expectedEntry);
+    expect(await userRepo.findOneBy({ id: response.data.data.id })).to.be.deep.eq(expectedEntry);
   });
 
   it('should refuse short passwords', async () => {
