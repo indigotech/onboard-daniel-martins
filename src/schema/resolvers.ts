@@ -43,8 +43,17 @@ export const resolvers = {
       await userRepo.save(user);
       return user;
     },
+
     async login(_: unknown, args: LoginUserInput): Promise<LoginOutput> {
       const userRepo = AppDataSource.getRepository(User);
+
+      if (!args.loginData.email || !args.loginData.password) {
+        throw new CustomError(
+          'Please type both your email and your password for login.',
+          400,
+          'Either the email or the password fields were empty on server request.',
+        );
+      }
 
       const hash = createHmac('sha256', 'internalizing server behavior');
       const hashedPassword = hash.update(args.loginData.password).digest('hex');
@@ -53,6 +62,14 @@ export const resolvers = {
         email: args.loginData.email,
         password: hashedPassword,
       });
+
+      if (user == null) {
+        throw new CustomError(
+          'User not found, please try again.',
+          404,
+          'Email and password did not correspond to any existing users in database.',
+        );
+      }
 
       return {
         user: user,
