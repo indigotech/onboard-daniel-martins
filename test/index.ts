@@ -1,25 +1,35 @@
 import axios from 'axios';
 import { expect } from 'chai';
 import * as dotenv from 'dotenv';
+import { UserInput } from '../schema/interfaces';
 import { startServer } from '../server';
 import { AppDataSource, clearDB } from '../src/data-source';
 import { User } from '../src/entity/User';
 
 const endpoint = 'http://localhost:3000/';
 
-function defaultInput() {
-  return {
-    name: 'Bob Semple',
-    email: 'bobsemple@gmail.com',
-    password: 'pass1234',
-    birthDate: '01-01-1990',
-  };
-}
-
 describe('createUser mutation tests', async () => {
+  let userInput: UserInput;
+  const createUserQuery = `mutation CreateUser ($userInput: UserInput!) { createUser(userData: $userInput) {
+    name,
+    email,
+    birthDate,
+    id,
+    }
+  }`;
+
   before(async () => {
     dotenv.config({ path: './test.env' });
     await startServer();
+  });
+
+  beforeEach(async () => {
+    userInput = {
+      name: 'Bob Semple',
+      email: 'bobsemple@gmail.com',
+      password: 'pass1234',
+      birthDate: '01-01-1990',
+    };
   });
 
   after(async () => {
@@ -32,17 +42,10 @@ describe('createUser mutation tests', async () => {
 
   it('should return user data back from the server', async () => {
     const userRepo = AppDataSource.getRepository(User);
-    const userInput = defaultInput();
 
     const validQuery = {
-      operationName: 'validQuery',
-      query: `mutation validQuery ($userInput: UserInput!) { createUser(userData: $userInput) {
-              name,
-              email,
-              birthDate
-              id
-            }
-          }`,
+      operationName: 'CreateUser',
+      query: createUserQuery,
       variables: {
         userInput: userInput,
       },
@@ -78,15 +81,11 @@ describe('createUser mutation tests', async () => {
   });
 
   it('should refuse short passwords', async () => {
-    const userInput = defaultInput();
     userInput.password = 'a1';
 
     const shortPassword = {
-      operationName: 'shortPassword',
-      query: `mutation shortPassword ($userInput: UserInput!) { createUser(userData: $userInput) {
-              name
-            }
-          }`,
+      operationName: 'CreateUser',
+      query: createUserQuery,
       variables: {
         userInput: userInput,
       },
@@ -105,15 +104,11 @@ describe('createUser mutation tests', async () => {
   });
 
   it('should refuse passwords without numbers', async () => {
-    const userInput = defaultInput();
     userInput.password = 'abcdef';
 
     const letterPassword = {
-      operationName: 'letterPassword',
-      query: `mutation letterPassword ($userInput: UserInput!) { createUser(userData: $userInput) {
-              name
-            }
-          }`,
+      operationName: 'CreateUser',
+      query: createUserQuery,
       variables: {
         userInput: userInput,
       },
@@ -132,15 +127,11 @@ describe('createUser mutation tests', async () => {
   });
 
   it('should refuse passwords without letters', async () => {
-    const userInput = defaultInput();
     userInput.password = '123456';
 
     const numberPassword = {
-      operationName: 'numberPassword',
-      query: `mutation numberPassword ($userInput: UserInput!) { createUser(userData: $userInput) {
-              name
-            }
-          }`,
+      operationName: 'CreateUser',
+      query: createUserQuery,
       variables: {
         userInput: userInput,
       },
@@ -159,14 +150,9 @@ describe('createUser mutation tests', async () => {
   });
 
   it('should refuse emails already in database', async () => {
-    const userInput = defaultInput();
-
     const emailUser = {
-      operationName: 'emailUser',
-      query: `mutation emailUser ($userInput: UserInput!) { createUser(userData: $userInput) {
-              name
-            }
-          }`,
+      operationName: 'CreateUser',
+      query: createUserQuery,
       variables: {
         userInput: userInput,
       },
