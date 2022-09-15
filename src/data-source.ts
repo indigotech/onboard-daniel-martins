@@ -19,3 +19,7 @@ export function dataSourceSetup() {
     subscribers: [],
   });
 }
+
+export async function clearDB() {
+  await AppDataSource.query('TRUNCATE TABLE "user" RESTART IDENTITY');
+}
