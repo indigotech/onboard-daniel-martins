@@ -16,7 +16,7 @@
       "typeorm": "0.3.9"
    },
    "scripts": {
-      "dev": "ts-node-dev --transpile-only --no-notify --exit-child index.ts",
+      "dev": "ts-node-dev --transpile-only --no-notify --exit-child src/index.ts",
       "start": "node server.js",
       "test": "mocha --exit -r ts-node/register test/index.ts",
       "build": "tsc --esModuleInterop server.ts",

@@ -1,7 +1,8 @@
 import { ApolloServer } from 'apollo-server';
 import 'reflect-metadata';
 import { typeDefs, resolvers } from './schema';
-import { AppDataSource, dataSourceSetup } from './src/data-source';
+import { AppDataSource, dataSourceSetup } from './data-source';
+import { formatError } from './format-error';
 
 export async function startDB() {
   console.info('Initializing database...');
@@ -17,6 +18,7 @@ export async function startServer() {
   const server = new ApolloServer({
     typeDefs,
     resolvers,
+    formatError,
   });
 
   const port = 3000;

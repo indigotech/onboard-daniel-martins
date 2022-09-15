@@ -1,20 +1,26 @@
 import { CreateUserInput, UserInput, UserOutput } from './interfaces';
-import { User } from '../src/entity/User';
-import { AppDataSource } from '../src/data-source';
+import { User } from '../entity/User';
+import { AppDataSource } from '../data-source';
 import { createHmac } from 'crypto';
+import { CustomError } from '../format-error';
 
 async function validateInput(userData: UserInput) {
   const userRepo = AppDataSource.getRepository(User);
   const validatePW = new RegExp('^(?=.*[A-Za-z])(?=.*\\d).{6,}$');
   if (validatePW.test(userData.password) == false) {
-    throw new Error(
+    throw new CustomError(
       'Password must be at least 6 characters long. Password must have at least one letter and one digit.',
+      400,
     );
   }
 
   const emailCount = await userRepo.findAndCountBy({ email: userData.email });
   if (emailCount[1] >= 1) {
-    throw new Error('Email address already in use.');
+    throw new CustomError(
+      'Email address already in use, please use another one or log in to your account.',
+      409,
+      'Inputted email address is already bound to an existing user in data source.',
+    );
   }
 }
 
