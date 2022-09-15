@@ -2,7 +2,8 @@ import axios from 'axios';
 import { expect } from 'chai';
 import { AppDataSource, clearDB } from '../src/data-source';
 import { User } from '../src/entity/User';
-import { hash, endpoint, defaultUser } from './index';
+import { UserInput } from '../src/schema/interfaces';
+import { hasher, endpoint, defaultUser } from './index';
 
 const createUserQuery = `mutation createUserQuery ($userInput: UserInput!) { createUser(userData: $userInput) {
     name,
@@ -12,11 +13,16 @@ const createUserQuery = `mutation createUserQuery ($userInput: UserInput!) { cre
   }
 }`
 
-let userInput;
+let userInput: UserInput;
 
 describe('\ncreateUser mutation tests', async () => {
   beforeEach(async () => {
-    userInput = defaultUser;
+    userInput = {
+        name: defaultUser.name,
+        email: defaultUser.email,
+        password: defaultUser.password,
+        birthDate: defaultUser.birthDate,
+      };;
   })
 
   afterEach(async () => {
@@ -53,7 +59,7 @@ describe('\ncreateUser mutation tests', async () => {
       id: 1,
       name: userInput.name,
       email: userInput.email,
-      password: hash.update(userInput.password).digest('hex'),
+      password: hasher(userInput.password),
       birthDate: userInput.birthDate,
     };
     expect(response.data).to.be.deep.eq(expectedResponse);

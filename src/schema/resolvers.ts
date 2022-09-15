@@ -4,7 +4,11 @@ import { AppDataSource } from '../data-source';
 import { createHmac } from 'crypto';
 import { CustomError } from '../format-error';
 
-export const hash = createHmac('sha256', 'internalizing server behavior');
+export function hasher(str: string) {
+  const hash = createHmac('sha256', 'internalizing server behavior');
+  const hashed = hash.update(str).digest('hex');
+  return hashed;
+}
 
 async function validateInput(userData: UserInput) {
   const userRepo = AppDataSource.getRepository(User);
@@ -37,7 +41,7 @@ export const resolvers = {
       user.name = args.userData.name;
       user.email = args.userData.email;
 
-      user.password = hash.update(args.userData.password).digest('hex');
+      user.password = hasher(args.userData.password);
       user.birthDate = args.userData.birthDate;
 
       await validateInput(args.userData);

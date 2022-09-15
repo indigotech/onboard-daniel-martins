@@ -2,7 +2,8 @@ import axios from 'axios';
 import { expect } from 'chai';
 import { AppDataSource, clearDB } from '../src/data-source';
 import { User } from '../src/entity/User';
-import { hash, endpoint, defaultUser } from './index';
+import { LoginInput } from '../src/schema/interfaces';
+import { hasher, endpoint, defaultUser } from './index';
 
 const loginQuery = `
   mutation loginQuery($loginInput: LoginInput!) {
@@ -17,21 +18,23 @@ const loginQuery = `
     }
   }
 `;
+const loginUser = defaultUser;
 
-let loginInput;
+let loginInput: LoginInput;
 
 describe('login mutation tests', async () => {
   before(async () => {
+    const hashedPW = hasher(loginUser.password)
     await AppDataSource.query(
       `INSERT INTO "user"(name, email, password, "birthDate") 
-      VALUES ('Bob Semple', 'bobsemple@gmail.com', '474d57b79c3cab2a4af8bf92c788a41601efae9e17dff9ef0fe86430016857cf', 'Yesterday')`,
+      VALUES ('${loginUser.name}', '${loginUser.email}', '${hashedPW}', '${loginUser.birthDate}')`,
     );
   });
 
   beforeEach(async () => {
     loginInput = {
-      email: 'bobsemple@gmail.com',
-      password: 'abc123',
+      email: loginUser.email,
+      password: loginUser.password,
     };
   });
 
@@ -57,9 +60,9 @@ describe('login mutation tests', async () => {
       data: {
         login: {
           user: {
-            name: 'Bob Semple',
-            email: 'bobsemple@gmail.com',
-            birthDate: 'Yesterday',
+            name: loginUser.name,
+            email: loginUser.email,
+            birthDate: loginUser.birthDate,
             id: 1,
           },
           token: 'the_token',
@@ -68,10 +71,10 @@ describe('login mutation tests', async () => {
     };
     const expectedEntry = {
         id: 1,
-        name: loginInput.name,
-        email: loginInput.email,
-        password: hash.update(loginInput.password).digest('hex'),
-        birthDate: loginInput.birthDate,
+        name: loginUser.name,
+        email: loginUser.email,
+        password: hasher(loginUser.password),
+        birthDate: loginUser.birthDate,
       };
     expect(response.data).to.be.deep.eq(expectedResponse);
     expect(await userRepo.findOneBy({ id: 1 })).to.be.deep.eq(expectedEntry);

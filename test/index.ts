@@ -2,10 +2,10 @@ import * as dotenv from 'dotenv';
 import { startServer } from '../src/server';
 import { AppDataSource, clearDB } from '../src/data-source';
 
-export { hash } from '../src/schema/resolvers';
+export { hasher } from '../src/schema/resolvers';
 export const endpoint = 'http://localhost:3000/';
 export const defaultUser = {
-  name: 'Bob Semple',
+  name: 'Bob sample',
   email: 'bobsemple@gmail.com',
   password: 'pass1234',
   birthDate: '01-01-1990',
