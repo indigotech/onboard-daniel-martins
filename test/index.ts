@@ -8,6 +8,15 @@ import { User } from '../src/entity/User';
 
 const endpoint = 'http://localhost:3000/';
 
+before(async () => {
+  dotenv.config({ path: './test.env' });
+  await startServer();
+});
+
+after(async () => {
+  await AppDataSource.destroy();
+});
+
 describe('createUser mutation tests', async () => {
   let userInput: UserInput;
   const createUserQuery = `mutation CreateUser ($userInput: UserInput!) { createUser(userData: $userInput) {
@@ -18,11 +27,6 @@ describe('createUser mutation tests', async () => {
     }
   }`;
 
-  before(async () => {
-    dotenv.config({ path: './test.env' });
-    await startServer();
-  });
-
   beforeEach(async () => {
     userInput = {
       name: 'Bob Semple',
@@ -30,10 +34,6 @@ describe('createUser mutation tests', async () => {
       password: 'pass1234',
       birthDate: '01-01-1990',
     };
-  });
-
-  after(async () => {
-    await AppDataSource.destroy();
   });
 
   afterEach(async () => {
