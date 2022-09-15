@@ -6,8 +6,7 @@ import { CustomError } from '../format-error';
 
 export function hasher(str: string) {
   const hash = createHmac('sha256', 'internalizing server behavior');
-  const hashed = hash.update(str).digest('hex');
-  return hashed;
+  return hash.update(str).digest('hex');
 }
 
 async function validateInput(userData: UserInput) {
@@ -17,6 +16,15 @@ async function validateInput(userData: UserInput) {
     throw new CustomError(
       'Password must be at least 6 characters long. Password must have at least one letter and one digit.',
       400,
+    );
+  }
+
+  const validateEmail = new RegExp('^\\w+([_\\.-]?[a-zA-Z0-9]+)*@[a-zA-Z0-9]+([_\\.-]?[a-zA-Z0-9]+)*(\\.\\w{2,3})+$');
+  if (validateEmail.test(userData.email) == false) {
+    throw new CustomError(
+      'Invalid email address, please try another one.',
+      400,
+      'Email address received by server is not properly formatted.',
     );
   }
 
@@ -52,26 +60,15 @@ export const resolvers = {
     async login(_: unknown, args: LoginUserInput): Promise<LoginOutput> {
       const userRepo = AppDataSource.getRepository(User);
 
-      if (!args.loginData.email || !args.loginData.password) {
-        throw new CustomError(
-          'Please type both your email and your password for login.',
-          400,
-          'Either the email or the password fields were empty on server request.',
-        );
-      }
-
-      const hash = createHmac('sha256', 'internalizing server behavior');
-      const hashedPassword = hash.update(args.loginData.password).digest('hex');
-
       const user = await userRepo.findOneBy({
         email: args.loginData.email,
-        password: hashedPassword,
+        password: hasher(args.loginData.password),
       });
 
       if (user == null) {
         throw new CustomError(
           'User not found, please try again.',
-          404,
+          401,
           'Email and password did not correspond to any existing users in database.',
         );
       }

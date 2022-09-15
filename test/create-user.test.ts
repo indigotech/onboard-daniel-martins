@@ -15,21 +15,16 @@ const createUserQuery = `mutation createUserQuery ($userInput: UserInput!) { cre
 
 let userInput: UserInput;
 
-describe('\ncreateUser mutation tests', async () => {
-  beforeEach(async () => {
-    userInput = {
-        name: defaultUser.name,
-        email: defaultUser.email,
-        password: defaultUser.password,
-        birthDate: defaultUser.birthDate,
-      };;
+describe('createUser mutation tests', async () => {
+  beforeEach(() => {
+    userInput = { ...defaultUser }
   })
 
   afterEach(async () => {
     await clearDB();
   });
 
-  it('should return user data back from the server', async () => {
+  it('should return created user data back from the server', async () => {
     const userRepo = AppDataSource.getRepository(User);
     const validQuery = {
       operationName: 'createUserQuery',
@@ -151,7 +146,7 @@ describe('\ncreateUser mutation tests', async () => {
   });
 
   it('should refuse emails already in database', async () => {
-    const emailUser = {
+    const repeatEmail = {
         operationName: 'createUserQuery',
         query: createUserQuery,
         variables: {
@@ -162,13 +157,13 @@ describe('\ncreateUser mutation tests', async () => {
     await axios({
       url: endpoint,
       method: 'post',
-      data: emailUser,
+      data: repeatEmail,
     });
 
     const response = await axios({
       url: endpoint,
       method: 'post',
-      data: emailUser,
+      data: repeatEmail,
     });
 
     const expectedResponse = {
@@ -177,6 +172,34 @@ describe('\ncreateUser mutation tests', async () => {
           message: 'Email address already in use, please use another one or log in to your account.',
           code: 400,
           additionalInfo: 'Inputted email address is already bound to an existing user in data source.',
+        },
+      ],
+      data: null,
+    };
+    expect(response.data).to.be.deep.eq(expectedResponse);
+  });
+  it('should refuse emails that are not properly formatted', async () => {
+    userInput.email = 'unacceptable.com';
+    const badEmail = {
+        operationName: 'createUserQuery',
+        query: createUserQuery,
+        variables: {
+          userInput: userInput,
+        },
+    };
+
+    const response = await axios({
+      url: endpoint,
+      method: 'post',
+      data: badEmail,
+    });
+
+    const expectedResponse = {
+      errors: [
+        {
+          message: 'Invalid email address, please try another one.',
+          code: 400,
+          additionalInfo: 'Email address received by server is not properly formatted.',
         },
       ],
       data: null,

@@ -18,20 +18,19 @@ const loginQuery = `
     }
   }
 `;
-const loginUser = defaultUser;
+const loginUser = { ...defaultUser };
 
 let loginInput: LoginInput;
 
 describe('login mutation tests', async () => {
   before(async () => {
-    const hashedPW = hasher(loginUser.password)
-    await AppDataSource.query(
-      `INSERT INTO "user"(name, email, password, "birthDate") 
-      VALUES ('${loginUser.name}', '${loginUser.email}', '${hashedPW}', '${loginUser.birthDate}')`,
-    );
+    const userRepo = AppDataSource.getRepository(User);
+    const dbUser = { ...loginUser };
+    dbUser.password = hasher(loginUser.password);
+    await userRepo.save(dbUser);
   });
 
-  beforeEach(async () => {
+  beforeEach(() => {
     loginInput = {
       email: loginUser.email,
       password: loginUser.password,
@@ -42,8 +41,7 @@ describe('login mutation tests', async () => {
     await clearDB();
   });
 
-  it('should return user data back from the server', async () => {
-    const userRepo = AppDataSource.getRepository(User);
+  it('should return logged user data with token back from the server', async () => {
     const validQuery = {
       operationName: 'loginQuery',
       query: loginQuery,
@@ -69,19 +67,11 @@ describe('login mutation tests', async () => {
         },
       },
     };
-    const expectedEntry = {
-        id: 1,
-        name: loginUser.name,
-        email: loginUser.email,
-        password: hasher(loginUser.password),
-        birthDate: loginUser.birthDate,
-      };
     expect(response.data).to.be.deep.eq(expectedResponse);
-    expect(await userRepo.findOneBy({ id: 1 })).to.be.deep.eq(expectedEntry);
   });
 
   it('should refuse bad credentials', async () => {
-    loginInput.email = 'wrongemail@gmail.com';
+    loginInput.email = 'doesnotexist@gmail.com';
     const badQuery = {
       operationName: 'loginQuery',
       query: loginQuery,
@@ -98,61 +88,8 @@ describe('login mutation tests', async () => {
       errors: [
         {
           message: 'User not found, please try again.',
-          code: 404,
+          code: 401,
           additionalInfo: 'Email and password did not correspond to any existing users in database.',
-        },
-      ],
-      data: null,
-    };
-    expect(response.data).to.be.deep.eq(expectedResponse);
-  });
-
-  it('should refuse requests with missing email', async () => {
-    loginInput.email = '';
-    const badQuery = {
-      operationName: 'loginQuery',
-      query: loginQuery,
-      variables: { loginInput: loginInput },
-    };
-
-    const response = await axios({
-      url: endpoint,
-      method: 'post',
-      data: badQuery,
-    });
-
-    const expectedResponse = {
-      errors: [
-        {
-          message: 'Please type both your email and your password for login.',
-          code: 400,
-          additionalInfo: 'Either the email or the password fields were empty on server request.',
-        },
-      ],
-      data: null,
-    };
-    expect(response.data).to.be.deep.eq(expectedResponse);
-  });
-  it('should refuse requests with missing password', async () => {
-    loginInput.password = '';
-    const badQuery = {
-      operationName: 'loginQuery',
-      query: loginQuery,
-      variables: { loginInput: loginInput },
-    };
-
-    const response = await axios({
-      url: endpoint,
-      method: 'post',
-      data: badQuery,
-    });
-
-    const expectedResponse = {
-      errors: [
-        {
-          message: 'Please type both your email and your password for login.',
-          code: 400,
-          additionalInfo: 'Either the email or the password fields were empty on server request.',
         },
       ],
       data: null,
