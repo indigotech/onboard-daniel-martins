@@ -1,4 +1,4 @@
-import { CreateUserInput, UserInput, UserOutput } from './interfaces';
+import { CreateUserInput, LoginOutput, LoginUserInput, UserInput, UserOutput } from './interfaces';
 import { User } from '../entity/User';
 import { AppDataSource } from '../data-source';
 import { createHmac } from 'crypto';
@@ -42,6 +42,22 @@ export const resolvers = {
       await validateInput(args.userData);
       await userRepo.save(user);
       return user;
+    },
+    async login(_: unknown, args: LoginUserInput): Promise<LoginOutput> {
+      const userRepo = AppDataSource.getRepository(User);
+
+      const hash = createHmac('sha256', 'internalizing server behavior');
+      const hashedPassword = hash.update(args.loginData.password).digest('hex');
+
+      const user = await userRepo.findOneBy({
+        email: args.loginData.email,
+        password: hashedPassword,
+      });
+
+      return {
+        user: user,
+        token: 'the_token',
+      };
     },
   },
 };

@@ -19,7 +19,18 @@ export const typeDefs = gql`
     birthDate: String!
   }
 
+  input LoginInput {
+    email: String!
+    password: String!
+  }
+
+  type LoginOutput {
+    user: UserOutput!
+    token: String!
+  }
+
   type Mutation {
     createUser(userData: UserInput): UserOutput!
+    login(loginData: LoginInput): LoginOutput!
   }
 `;
