@@ -18,7 +18,7 @@ async function validateInput(userData: UserInput) {
   if (emailCount[1] >= 1) {
     throw new CustomError(
       'Email address already in use, please use another one or log in to your account.',
-      400,
+      409,
       'Inputted email address is already bound to an existing user in data source.',
     );
   }
