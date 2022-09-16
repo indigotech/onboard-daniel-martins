@@ -19,6 +19,9 @@ export async function startServer() {
     typeDefs,
     resolvers,
     formatError,
+    context: ({ req }) => ({
+      token: req.headers.authorization,
+    }),
   });
 
   const port = 3000;

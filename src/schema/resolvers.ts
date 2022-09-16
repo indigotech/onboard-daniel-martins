@@ -1,8 +1,11 @@
-import { CreateUserInput, LoginOutput, LoginUserInput, UserInput, UserOutput } from './interfaces';
+import { CreateUserInput, JWTPayload, LoginOutput, LoginUserInput, UserInput, UserOutput } from './interfaces';
 import { User } from '../entity/User';
 import { AppDataSource } from '../data-source';
 import { createHmac } from 'crypto';
 import { CustomError } from '../format-error';
+import * as jwt from 'jsonwebtoken';
+
+export const tokenSecret = 'Understanding how to fly into w@ll5';
 
 export function hashString(str: string) {
   const hash = createHmac('sha256', 'internalizing server behavior');
@@ -40,12 +43,28 @@ async function validateInput(userData: UserInput) {
   }
 }
 
+export function createToken(userID: number, rememberMe = false) {
+  return jwt.sign({ userID: userID }, tokenSecret, rememberMe ? { expiresIn: '7d' } : undefined);
+}
+
 export const resolvers = {
   Query: {
     hello: () => `Hello, Taqtiler!`,
   },
   Mutation: {
-    async createUser(_: unknown, args: CreateUserInput): Promise<UserOutput> {
+    async createUser(_: unknown, args: CreateUserInput, context: { token: string }): Promise<UserOutput> {
+      try {
+        const tokenPayload = jwt.verify(context.token, tokenSecret) as JWTPayload;
+        if (!tokenPayload.userID || !tokenPayload.iat) {
+          throw new Error('jwt token missing expected fields');
+        }
+        if (tokenPayload.userID <= 0) {
+          throw new Error('jwt token has invalid user id');
+        }
+      } catch (err) {
+        throw new CustomError('Login error, please try to sign in again.', 401, err.message);
+      }
+
       const userRepo = AppDataSource.getRepository(User);
       const user = new User();
       user.name = args.userData.name;
@@ -75,9 +94,11 @@ export const resolvers = {
         );
       }
 
+      const token = createToken(user.id, args.rememberMe);
+
       return {
         user: user,
-        token: 'the_token',
+        token: token,
       };
     },
   },

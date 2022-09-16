@@ -18,6 +18,7 @@ export interface UserOutput {
 
 export interface LoginUserInput {
   loginData: LoginInput;
+  rememberMe: boolean;
 }
 
 export interface LoginInput {
@@ -28,4 +29,10 @@ export interface LoginInput {
 export interface LoginOutput {
   user: UserOutput;
   token: string;
+}
+
+export interface JWTPayload {
+  userID: number;
+  iat: number;
+  exp: number;
 }
