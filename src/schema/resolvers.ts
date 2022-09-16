@@ -1,4 +1,12 @@
-import { CreateUserInput, JWTPayload, LoginOutput, LoginUserInput, UserInput, UserOutput } from './interfaces';
+import {
+  CreateUserInput,
+  JWTPayload,
+  LoginOutput,
+  LoginUserInput,
+  UserInput,
+  UserList,
+  UserOutput,
+} from './interfaces';
 import { User } from '../entity/User';
 import { AppDataSource } from '../data-source';
 import { createHmac } from 'crypto';
@@ -78,21 +86,39 @@ export const resolvers = {
 
       return foundUser;
     },
-    async users(_: unknown, args: { userNum: number }, context: { token: string }) {
+    async users(_: unknown, args: { userMax: number; page: number }, context: { token: string }): Promise<UserList> {
       authenticateToken(context.token);
-
+      if (args.page < 0 || args.userMax <= 0) {
+        throw new CustomError(
+          'Invalid page and/or user number, please try again',
+          401,
+          'Either the page number or the max users per page number received were negative.',
+        );
+      }
       const userRepo = AppDataSource.getRepository(User);
-      const foundUser = await userRepo.find({
+      const userNum = await userRepo.count();
+      const maxPage = Math.ceil(userNum / args.userMax);
+      const page = args.page ? (args.userMax * (args.page - 1) > userNum ? maxPage : args.page) : 1;
+      const userOffset = args.userMax * (page - 1);
+      const userLimit = args.userMax ? args.userMax : 20;
+
+      const foundUsers = await userRepo.find({
         order: { name: 'ASC' },
-        skip: 0,
-        take: args.userNum ? args.userNum : 20,
+        skip: userOffset,
+        take: userLimit,
       });
 
-      if (foundUser == null) {
+      if (foundUsers == null) {
         throw new CustomError('No users found.', 404, 'Database is currently empty, and has no users to return.');
       }
 
-      return foundUser;
+      return {
+        users: foundUsers as [User],
+        userNum: userNum,
+        usersAfter: userOffset + userLimit < userNum,
+        usersBefore: userOffset > 0,
+        maxPage: maxPage,
+      };
     },
   },
   Mutation: {
