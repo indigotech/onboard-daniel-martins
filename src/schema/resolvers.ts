@@ -14,7 +14,7 @@ export function hashString(str: string) {
 
 async function validateInput(userData: UserInput) {
   const userRepo = AppDataSource.getRepository(User);
-  const passwordValidationRegex = new RegExp('^(?=.*[A-Za-z])(?=.*\\d).{6,}$');
+  const passwordValidationRegex = new RegExp(/^(?=.*[A-Za-z])(?=.*\d).{6,}$/);
   if (passwordValidationRegex.test(userData.password) == false) {
     throw new CustomError(
       'Password must be at least 6 characters long. Password must have at least one letter and one digit.',
@@ -22,9 +22,7 @@ async function validateInput(userData: UserInput) {
     );
   }
 
-  const emailValidationRegex = new RegExp(
-    '^\\w+([_\\.-]?[a-zA-Z0-9]+)*@[a-zA-Z0-9]+([_\\.-]?[a-zA-Z0-9]+)*(\\.\\w{2,3})+$',
-  );
+  const emailValidationRegex = new RegExp(/^\w+([_.-]?[a-zA-Z0-9]+)*@[a-zA-Z0-9]+([_.-]?[a-zA-Z0-9]+)*(\.\w{2,3})+$/);
   if (emailValidationRegex.test(userData.email) == false) {
     throw new CustomError(
       'Invalid email address, please try another one.',
@@ -76,6 +74,22 @@ export const resolvers = {
           401,
           'Searched ID did not correspond to any existing users in database.',
         );
+      }
+
+      return foundUser;
+    },
+    async users(_: unknown, args: { userNum: number }, context: { token: string }) {
+      authenticateToken(context.token);
+
+      const userRepo = AppDataSource.getRepository(User);
+      const foundUser = await userRepo.find({
+        order: { name: 'ASC' },
+        skip: 0,
+        take: args.userNum ? args.userNum : 20,
+      });
+
+      if (foundUser == null) {
+        throw new CustomError('No users found.', 404, 'Database is currently empty, and has no users to return.');
       }
 
       return foundUser;

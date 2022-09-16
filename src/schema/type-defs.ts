@@ -4,6 +4,7 @@ export const typeDefs = gql`
   type Query {
     hello: String!
     user(userID: Int!): UserOutput
+    users(userNum: Int): [UserOutput]
   }
 
   input UserInput {
