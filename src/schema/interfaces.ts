@@ -15,3 +15,17 @@ export interface UserOutput {
   id: number;
   birthDate: string;
 }
+
+export interface LoginUserInput {
+  loginData: LoginInput;
+}
+
+export interface LoginInput {
+  email: string;
+  password: string;
+}
+
+export interface LoginOutput {
+  user: UserOutput;
+  token: string;
+}

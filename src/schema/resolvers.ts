@@ -1,16 +1,32 @@
-import { CreateUserInput, UserInput, UserOutput } from './interfaces';
+import { CreateUserInput, LoginOutput, LoginUserInput, UserInput, UserOutput } from './interfaces';
 import { User } from '../entity/User';
 import { AppDataSource } from '../data-source';
 import { createHmac } from 'crypto';
 import { CustomError } from '../format-error';
 
+export function hashString(str: string) {
+  const hash = createHmac('sha256', 'internalizing server behavior');
+  return hash.update(str).digest('hex');
+}
+
 async function validateInput(userData: UserInput) {
   const userRepo = AppDataSource.getRepository(User);
-  const validatePW = new RegExp('^(?=.*[A-Za-z])(?=.*\\d).{6,}$');
-  if (validatePW.test(userData.password) == false) {
+  const passwordValidationRegex = new RegExp('^(?=.*[A-Za-z])(?=.*\\d).{6,}$');
+  if (passwordValidationRegex.test(userData.password) == false) {
     throw new CustomError(
       'Password must be at least 6 characters long. Password must have at least one letter and one digit.',
       400,
+    );
+  }
+
+  const emailValidationRegex = new RegExp(
+    '^\\w+([_\\.-]?[a-zA-Z0-9]+)*@[a-zA-Z0-9]+([_\\.-]?[a-zA-Z0-9]+)*(\\.\\w{2,3})+$',
+  );
+  if (emailValidationRegex.test(userData.email) == false) {
+    throw new CustomError(
+      'Invalid email address, please try another one.',
+      400,
+      'Email address received by server is not properly formatted.',
     );
   }
 
@@ -35,13 +51,34 @@ export const resolvers = {
       user.name = args.userData.name;
       user.email = args.userData.email;
 
-      const hash = createHmac('sha256', 'internalizing server behavior');
-      user.password = hash.update(args.userData.password).digest('hex');
+      user.password = hashString(args.userData.password);
       user.birthDate = args.userData.birthDate;
 
       await validateInput(args.userData);
       await userRepo.save(user);
       return user;
+    },
+
+    async login(_: unknown, args: LoginUserInput): Promise<LoginOutput> {
+      const userRepo = AppDataSource.getRepository(User);
+
+      const user = await userRepo.findOneBy({
+        email: args.loginData.email,
+        password: hashString(args.loginData.password),
+      });
+
+      if (user == null) {
+        throw new CustomError(
+          'User not found, please try again.',
+          401,
+          'Email and password did not correspond to any existing users in database.',
+        );
+      }
+
+      return {
+        user: user,
+        token: 'the_token',
+      };
     },
   },
 };
