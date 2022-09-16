@@ -70,7 +70,7 @@ export const resolvers = {
       const userRepo = AppDataSource.getRepository(User);
       const foundUser = await userRepo.findOneBy({ id: args.userID });
 
-      if (foundUser == null) {
+      if (!foundUser) {
         throw new CustomError(
           'User not found, please try again.',
           401,

@@ -44,6 +44,22 @@ describe('user query tests', async () => {
     await clearDB();
   });
 
+  it('should return searched user data', async () => {
+    const response = await axios(request);
+
+    const expectedResponse = {
+      data: {
+        user: {
+          id: 1,
+          name: 'Bob sample',
+          email: 'bobsemple@gmail.com',
+          birthDate: '01-01-1990',
+        },
+      },
+    };
+    expect(response.data).to.be.deep.eq(expectedResponse);
+  });
+
   it('should refuse nonexistent ids', async () => {
     operation.variables.userID = 0;
 
