@@ -6,23 +6,39 @@ import { UserInput } from '../src/schema/interfaces';
 import { endpoint, defaultUser, createToken } from './index';
 import { hashString } from '../src/schema/resolvers';
 
+let userInput: UserInput;
+
 const createUserQuery = `
   mutation createUserQuery($userInput: UserInput!) {
     createUser(userData: $userInput) {
-      name
-      email
-      birthDate
-      id
-    }
+    name
+    email
+    birthDate
+    id
+  }
   }
 `;
 const validToken = createToken(1);
-
-let userInput: UserInput;
+const operation = {
+  operationName: 'createUserQuery',
+  query: createUserQuery,
+  variables: {
+    userInput: userInput,
+  },
+};
+const request = {
+  url: endpoint,
+  method: 'post',
+  data: operation,
+  headers: {
+    Authorization: validToken,
+  },
+};
 
 describe('createUser mutation tests', async () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     userInput = { ...defaultUser };
+    operation.variables.userInput = userInput;
   });
 
   afterEach(async () => {
@@ -31,22 +47,8 @@ describe('createUser mutation tests', async () => {
 
   it('should return created user data back from the server', async () => {
     const userRepo = AppDataSource.getRepository(User);
-    const validQuery = {
-      operationName: 'createUserQuery',
-      query: createUserQuery,
-      variables: {
-        userInput: userInput,
-      },
-    };
 
-    const response = await axios({
-      url: endpoint,
-      method: 'post',
-      data: validQuery,
-      headers: {
-        Authorization: validToken,
-      },
-    });
+    const response = await axios(request);
 
     const expectedResponse = {
       data: {
@@ -71,22 +73,8 @@ describe('createUser mutation tests', async () => {
 
   it('should refuse short passwords', async () => {
     userInput.password = 'a1';
-    const shortPassword = {
-      operationName: 'createUserQuery',
-      query: createUserQuery,
-      variables: {
-        userInput: userInput,
-      },
-    };
 
-    const response = await axios({
-      url: endpoint,
-      method: 'post',
-      data: shortPassword,
-      headers: {
-        Authorization: validToken,
-      },
-    });
+    const response = await axios(request);
 
     const expectedResponse = {
       errors: [
@@ -102,22 +90,8 @@ describe('createUser mutation tests', async () => {
 
   it('should refuse passwords without numbers', async () => {
     userInput.password = 'abcdef';
-    const letterPassword = {
-      operationName: 'createUserQuery',
-      query: createUserQuery,
-      variables: {
-        userInput: userInput,
-      },
-    };
 
-    const response = await axios({
-      url: endpoint,
-      method: 'post',
-      data: letterPassword,
-      headers: {
-        Authorization: validToken,
-      },
-    });
+    const response = await axios(request);
 
     const expectedResponse = {
       errors: [
@@ -133,22 +107,8 @@ describe('createUser mutation tests', async () => {
 
   it('should refuse passwords without letters', async () => {
     userInput.password = '123456';
-    const numberPassword = {
-      operationName: 'createUserQuery',
-      query: createUserQuery,
-      variables: {
-        userInput: userInput,
-      },
-    };
 
-    const response = await axios({
-      url: endpoint,
-      method: 'post',
-      data: numberPassword,
-      headers: {
-        Authorization: validToken,
-      },
-    });
+    const response = await axios(request);
 
     const expectedResponse = {
       errors: [
@@ -163,31 +123,8 @@ describe('createUser mutation tests', async () => {
   });
 
   it('should refuse emails already in database', async () => {
-    const repeatEmail = {
-      operationName: 'createUserQuery',
-      query: createUserQuery,
-      variables: {
-        userInput: userInput,
-      },
-    };
-
-    await axios({
-      url: endpoint,
-      method: 'post',
-      data: repeatEmail,
-      headers: {
-        Authorization: validToken,
-      },
-    });
-
-    const response = await axios({
-      url: endpoint,
-      method: 'post',
-      data: repeatEmail,
-      headers: {
-        Authorization: validToken,
-      },
-    });
+    await axios(request);
+    const response = await axios(request);
 
     const expectedResponse = {
       errors: [
@@ -232,18 +169,10 @@ describe('createUser mutation tests', async () => {
   });
 
   it('should refuse users without authentication', async () => {
-    const noAuth = {
-      operationName: 'createUserQuery',
-      query: createUserQuery,
-      variables: {
-        userInput: userInput,
-      },
-    };
-
     const response = await axios({
       url: endpoint,
       method: 'post',
-      data: noAuth,
+      data: operation,
     });
 
     const expectedResponse = {
@@ -260,18 +189,10 @@ describe('createUser mutation tests', async () => {
   });
 
   it('should refuse users with bad authentication', async () => {
-    const badAuth = {
-      operationName: 'createUserQuery',
-      query: createUserQuery,
-      variables: {
-        userInput: userInput,
-      },
-    };
-
     const response = await axios({
       url: endpoint,
       method: 'post',
-      data: badAuth,
+      data: operation,
       headers: {
         Authorization: createToken(-1),
       },

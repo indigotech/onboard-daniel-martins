@@ -6,6 +6,8 @@ import { LoginInput } from '../src/schema/interfaces';
 import { endpoint, defaultUser, createToken } from './index';
 import { hashString } from '../src/schema/resolvers';
 
+let loginInput: LoginInput;
+
 const loginQuery = `
   mutation loginQuery($loginInput: LoginInput!) {
     login(loginData: $loginInput) {
@@ -20,8 +22,16 @@ const loginQuery = `
   }
 `;
 const loginUser = { ...defaultUser };
-
-let loginInput: LoginInput;
+const operation = {
+  operationName: 'loginQuery',
+  query: loginQuery,
+  variables: { loginInput: loginInput },
+};
+const request = {
+  url: endpoint,
+  method: 'post',
+  data: operation,
+};
 
 describe('login mutation tests', async () => {
   before(async () => {
@@ -36,6 +46,7 @@ describe('login mutation tests', async () => {
       email: loginUser.email,
       password: loginUser.password,
     };
+    operation.variables.loginInput = loginInput;
   });
 
   afterEach(async () => {
@@ -43,17 +54,8 @@ describe('login mutation tests', async () => {
   });
 
   it('should return logged user data with token back from the server', async () => {
-    const validQuery = {
-      operationName: 'loginQuery',
-      query: loginQuery,
-      variables: { loginInput: loginInput },
-    };
 
-    const response = await axios({
-      url: endpoint,
-      method: 'post',
-      data: validQuery,
-    });
+    const response = await axios(request);
 
     const expectedEntry = {
       id: 1,
@@ -80,17 +82,8 @@ describe('login mutation tests', async () => {
 
   it('should refuse bad credentials', async () => {
     loginInput.email = 'doesnotexist@gmail.com';
-    const badQuery = {
-      operationName: 'loginQuery',
-      query: loginQuery,
-      variables: { loginInput: loginInput },
-    };
 
-    const response = await axios({
-      url: endpoint,
-      method: 'post',
-      data: badQuery,
-    });
+    const response = await axios(request);
 
     const expectedResponse = {
       errors: [

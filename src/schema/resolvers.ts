@@ -42,13 +42,7 @@ async function validateInput(userData: UserInput) {
 }
 
 export function createToken(userID: number, rememberMe = false) {
-  let token: string;
-  if (rememberMe) {
-    token = jwt.sign({ userID: userID }, 'Understanding how to fly into w@ll5', { expiresIn: '7d' });
-  } else {
-    token = jwt.sign({ userID: userID }, 'Understanding how to fly into w@ll5');
-  }
-  return token;
+  return jwt.sign({ userID: userID }, 'Understanding how to fly into w@ll5', rememberMe ? { expiresIn: '7d' } : null);
 }
 
 export const resolvers = {
