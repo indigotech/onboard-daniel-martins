@@ -2,7 +2,8 @@ import axios from 'axios';
 import { expect } from 'chai';
 import { AppDataSource, clearDB } from '../src/data-source';
 import { User } from '../src/entity/User';
-import { hasher, endpoint, defaultUser, createToken } from './index';
+import { endpoint, defaultUser } from './index';
+import { hashString, createToken } from '../src/schema/resolvers';
 
 const validToken = createToken(1);
 const userQuery = `
@@ -35,7 +36,7 @@ describe('user query tests', async () => {
   before(async () => {
     const userRepo = AppDataSource.getRepository(User);
     const dbUser = { ...defaultUser };
-    dbUser.password = hasher(defaultUser.password);
+    dbUser.password = hashString(defaultUser.password);
     await userRepo.save(dbUser);
   });
 
