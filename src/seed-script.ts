@@ -4,7 +4,7 @@ import { User } from './entity/User';
 import { startDB } from './server';
 import * as dotenv from 'dotenv';
 
-async function seeder() {
+async function seedUsers() {
   await startDB();
   const userRepo = AppDataSource.getRepository(User);
 
@@ -20,5 +20,5 @@ async function seeder() {
 
 if (require.main === module) {
   dotenv.config();
-  seeder();
+  seedUsers();
 }
