@@ -5,6 +5,8 @@ import { createHmac } from 'crypto';
 import { CustomError } from '../format-error';
 import * as jwt from 'jsonwebtoken';
 
+export const tokenSecret = 'Understanding how to fly into w@ll5';
+
 export function hashString(str: string) {
   const hash = createHmac('sha256', 'internalizing server behavior');
   return hash.update(str).digest('hex');
@@ -42,7 +44,7 @@ async function validateInput(userData: UserInput) {
 }
 
 export function createToken(userID: number, rememberMe = false) {
-  return jwt.sign({ userID: userID }, 'Understanding how to fly into w@ll5', rememberMe ? { expiresIn: '7d' } : null);
+  return jwt.sign({ userID: userID }, tokenSecret, rememberMe ? { expiresIn: '7d' } : undefined);
 }
 
 export const resolvers = {
@@ -52,7 +54,7 @@ export const resolvers = {
   Mutation: {
     async createUser(_: unknown, args: CreateUserInput, context: { token: string }): Promise<UserOutput> {
       try {
-        const tokenPayload = jwt.verify(context.token, 'Understanding how to fly into w@ll5') as JWTPayload;
+        const tokenPayload = jwt.verify(context.token, tokenSecret) as JWTPayload;
         if (!tokenPayload.userID || !tokenPayload.iat) {
           throw new Error('jwt token missing expected fields');
         }
