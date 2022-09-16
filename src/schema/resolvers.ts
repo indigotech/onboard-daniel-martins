@@ -79,14 +79,6 @@ export const resolvers = {
     async login(_: unknown, args: LoginUserInput): Promise<LoginOutput> {
       const userRepo = AppDataSource.getRepository(User);
 
-      if (!args.loginData.email || !args.loginData.password) {
-        throw new CustomError(
-          'Please type both your email and your password for login.',
-          400,
-          'Either the email or the password fields were empty on server request.',
-        );
-      }
-
       const user = await userRepo.findOneBy({
         email: args.loginData.email,
         password: hashString(args.loginData.password),
