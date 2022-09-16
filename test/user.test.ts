@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { expect } from 'chai';
-import { AppDataSource } from '../src/data-source';
+import { AppDataSource, clearDB } from '../src/data-source';
 import { User } from '../src/entity/User';
 import { hasher, endpoint, defaultUser, createToken } from './index';
 
@@ -39,7 +39,11 @@ describe('user query tests', async () => {
     await userRepo.save(dbUser);
   });
 
-  it('should refuse unexisting ids', async () => {
+  afterEach(async () => {
+    await clearDB();
+  });
+
+  it('should refuse nonexistent ids', async () => {
     operation.variables.userID = 0;
 
     const response = await axios(request);
@@ -50,6 +54,53 @@ describe('user query tests', async () => {
           message: 'User not found, please try again.',
           code: 401,
           additionalInfo: 'Searched ID did not correspond to any existing users in database.',
+        },
+      ],
+      data: {
+        user: null,
+      },
+    };
+    expect(response.data).to.be.deep.eq(expectedResponse);
+  });
+
+  it('should refuse users without authentication', async () => {
+    const response = await axios({
+      url: endpoint,
+      method: 'post',
+      data: operation,
+    });
+
+    const expectedResponse = {
+      errors: [
+        {
+          message: 'Login error, please try to sign in again.',
+          code: 401,
+          additionalInfo: 'jwt must be provided',
+        },
+      ],
+      data: {
+        user: null,
+      },
+    };
+    expect(response.data).to.be.deep.eq(expectedResponse);
+  });
+
+  it('should refuse users with bad authentication', async () => {
+    const response = await axios({
+      url: endpoint,
+      method: 'post',
+      data: operation,
+      headers: {
+        Authorization: createToken(-1),
+      },
+    });
+
+    const expectedResponse = {
+      errors: [
+        {
+          message: 'Login error, please try to sign in again.',
+          code: 401,
+          additionalInfo: 'jwt token has invalid user id',
         },
       ],
       data: {

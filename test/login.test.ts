@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { expect } from 'chai';
-import { AppDataSource } from '../src/data-source';
+import { AppDataSource, clearDB } from '../src/data-source';
 import { User } from '../src/entity/User';
 import { LoginInput } from '../src/schema/interfaces';
 import { endpoint, defaultUser } from './index';
@@ -47,6 +47,10 @@ describe('login mutation tests', async () => {
       password: loginUser.password,
     };
     operation.variables.loginInput = loginInput;
+  });
+
+  afterEach(async () => {
+    await clearDB();
   });
 
   it('should return logged user data with token back from the server', async () => {
