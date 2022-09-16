@@ -11,16 +11,18 @@ export function hashString(str: string) {
 
 async function validateInput(userData: UserInput) {
   const userRepo = AppDataSource.getRepository(User);
-  const validatePW = new RegExp('^(?=.*[A-Za-z])(?=.*\\d).{6,}$');
-  if (validatePW.test(userData.password) == false) {
+  const passwordValidationRegex = new RegExp('^(?=.*[A-Za-z])(?=.*\\d).{6,}$');
+  if (passwordValidationRegex.test(userData.password) == false) {
     throw new CustomError(
       'Password must be at least 6 characters long. Password must have at least one letter and one digit.',
       400,
     );
   }
 
-  const validateEmail = new RegExp('^\\w+([_\\.-]?[a-zA-Z0-9]+)*@[a-zA-Z0-9]+([_\\.-]?[a-zA-Z0-9]+)*(\\.\\w{2,3})+$');
-  if (validateEmail.test(userData.email) == false) {
+  const emailValidationRegex = new RegExp(
+    '^\\w+([_\\.-]?[a-zA-Z0-9]+)*@[a-zA-Z0-9]+([_\\.-]?[a-zA-Z0-9]+)*(\\.\\w{2,3})+$',
+  );
+  if (emailValidationRegex.test(userData.email) == false) {
     throw new CustomError(
       'Invalid email address, please try another one.',
       400,

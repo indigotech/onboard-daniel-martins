@@ -3,22 +3,26 @@ import { expect } from 'chai';
 import { AppDataSource, clearDB } from '../src/data-source';
 import { User } from '../src/entity/User';
 import { UserInput } from '../src/schema/interfaces';
-import { hashString, endpoint, defaultUser } from './index';
+import { endpoint, defaultUser } from './index';
+import { hashString } from '../src/schema/resolvers';
 
-const createUserQuery = `mutation createUserQuery ($userInput: UserInput!) { createUser(userData: $userInput) {
-    name,
-    email,
-    birthDate
-    id
+const createUserQuery = `
+  mutation createUserQuery($userInput: UserInput!) {
+    createUser(userData: $userInput) {
+      name
+      email
+      birthDate
+      id
+    }
   }
-}`
+`;
 
 let userInput: UserInput;
 
 describe('createUser mutation tests', async () => {
   beforeEach(() => {
-    userInput = { ...defaultUser }
-  })
+    userInput = { ...defaultUser };
+  });
 
   afterEach(async () => {
     await clearDB();
@@ -64,11 +68,11 @@ describe('createUser mutation tests', async () => {
   it('should refuse short passwords', async () => {
     userInput.password = 'a1';
     const shortPassword = {
-        operationName: 'createUserQuery',
-        query: createUserQuery,
-        variables: {
-          userInput: userInput,
-        },
+      operationName: 'createUserQuery',
+      query: createUserQuery,
+      variables: {
+        userInput: userInput,
+      },
     };
 
     const response = await axios({
@@ -92,11 +96,11 @@ describe('createUser mutation tests', async () => {
   it('should refuse passwords without numbers', async () => {
     userInput.password = 'abcdef';
     const letterPassword = {
-        operationName: 'createUserQuery',
-        query: createUserQuery,
-        variables: {
-          userInput: userInput,
-        },
+      operationName: 'createUserQuery',
+      query: createUserQuery,
+      variables: {
+        userInput: userInput,
+      },
     };
 
     const response = await axios({
@@ -120,11 +124,11 @@ describe('createUser mutation tests', async () => {
   it('should refuse passwords without letters', async () => {
     userInput.password = '123456';
     const numberPassword = {
-        operationName: 'createUserQuery',
-        query: createUserQuery,
-        variables: {
-          userInput: userInput,
-        },
+      operationName: 'createUserQuery',
+      query: createUserQuery,
+      variables: {
+        userInput: userInput,
+      },
     };
 
     const response = await axios({
@@ -147,11 +151,11 @@ describe('createUser mutation tests', async () => {
 
   it('should refuse emails already in database', async () => {
     const repeatEmail = {
-        operationName: 'createUserQuery',
-        query: createUserQuery,
-        variables: {
-          userInput: userInput,
-        },
+      operationName: 'createUserQuery',
+      query: createUserQuery,
+      variables: {
+        userInput: userInput,
+      },
     };
 
     await axios({
@@ -178,14 +182,15 @@ describe('createUser mutation tests', async () => {
     };
     expect(response.data).to.be.deep.eq(expectedResponse);
   });
+
   it('should refuse emails that are not properly formatted', async () => {
     userInput.email = 'unacceptable.com';
     const badEmail = {
-        operationName: 'createUserQuery',
-        query: createUserQuery,
-        variables: {
-          userInput: userInput,
-        },
+      operationName: 'createUserQuery',
+      query: createUserQuery,
+      variables: {
+        userInput: userInput,
+      },
     };
 
     const response = await axios({

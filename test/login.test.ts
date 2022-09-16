@@ -3,7 +3,8 @@ import { expect } from 'chai';
 import { AppDataSource, clearDB } from '../src/data-source';
 import { User } from '../src/entity/User';
 import { LoginInput } from '../src/schema/interfaces';
-import { hashString, endpoint, defaultUser } from './index';
+import { endpoint, defaultUser } from './index';
+import { hashString } from '../src/schema/resolvers';
 
 const loginQuery = `
   mutation loginQuery($loginInput: LoginInput!) {
