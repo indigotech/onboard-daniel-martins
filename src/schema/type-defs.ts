@@ -31,6 +31,6 @@ export const typeDefs = gql`
 
   type Mutation {
     createUser(userData: UserInput): UserOutput!
-    login(loginData: LoginInput): LoginOutput!
+    login(loginData: LoginInput, rememberMe: Boolean): LoginOutput!
   }
 `;

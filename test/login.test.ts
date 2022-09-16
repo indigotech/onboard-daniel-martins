@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import { AppDataSource, clearDB } from '../src/data-source';
 import { User } from '../src/entity/User';
 import { LoginInput } from '../src/schema/interfaces';
-import { endpoint, defaultUser } from './index';
+import { endpoint, defaultUser, createToken } from './index';
 import { hashString } from '../src/schema/resolvers';
 
 const loginQuery = `
@@ -55,6 +55,13 @@ describe('login mutation tests', async () => {
       data: validQuery,
     });
 
+    const expectedEntry = {
+      id: 1,
+      name: loginUser.name,
+      email: loginUser.email,
+      password: hasher(loginUser.password),
+      birthDate: loginUser.birthDate,
+    };
     const expectedResponse = {
       data: {
         login: {
@@ -64,7 +71,7 @@ describe('login mutation tests', async () => {
             birthDate: loginUser.birthDate,
             id: 1,
           },
-          token: 'the_token',
+          token: createToken(expectedEntry.id),
         },
       },
     };

@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import { AppDataSource, clearDB } from '../src/data-source';
 import { User } from '../src/entity/User';
 import { UserInput } from '../src/schema/interfaces';
-import { endpoint, defaultUser } from './index';
+import { endpoint, defaultUser, createToken } from './index';
 import { hashString } from '../src/schema/resolvers';
 
 const createUserQuery = `
@@ -16,6 +16,7 @@ const createUserQuery = `
     }
   }
 `;
+const validToken = createToken(1);
 
 let userInput: UserInput;
 
@@ -42,6 +43,9 @@ describe('createUser mutation tests', async () => {
       url: endpoint,
       method: 'post',
       data: validQuery,
+      headers: {
+        Authorization: validToken,
+      },
     });
 
     const expectedResponse = {
@@ -79,6 +83,9 @@ describe('createUser mutation tests', async () => {
       url: endpoint,
       method: 'post',
       data: shortPassword,
+      headers: {
+        Authorization: validToken,
+      },
     });
 
     const expectedResponse = {
@@ -107,6 +114,9 @@ describe('createUser mutation tests', async () => {
       url: endpoint,
       method: 'post',
       data: letterPassword,
+      headers: {
+        Authorization: validToken,
+      },
     });
 
     const expectedResponse = {
@@ -135,6 +145,9 @@ describe('createUser mutation tests', async () => {
       url: endpoint,
       method: 'post',
       data: numberPassword,
+      headers: {
+        Authorization: validToken,
+      },
     });
 
     const expectedResponse = {
@@ -162,12 +175,18 @@ describe('createUser mutation tests', async () => {
       url: endpoint,
       method: 'post',
       data: repeatEmail,
+      headers: {
+        Authorization: validToken,
+      },
     });
 
     const response = await axios({
       url: endpoint,
       method: 'post',
       data: repeatEmail,
+      headers: {
+        Authorization: validToken,
+      },
     });
 
     const expectedResponse = {
@@ -205,6 +224,65 @@ describe('createUser mutation tests', async () => {
           message: 'Invalid email address, please try another one.',
           code: 400,
           additionalInfo: 'Email address received by server is not properly formatted.',
+        },
+      ],
+      data: null,
+    };
+    expect(response.data).to.be.deep.eq(expectedResponse);
+  });
+
+  it('should refuse users without authentication', async () => {
+    const noAuth = {
+      operationName: 'createUserQuery',
+      query: createUserQuery,
+      variables: {
+        userInput: userInput,
+      },
+    };
+
+    const response = await axios({
+      url: endpoint,
+      method: 'post',
+      data: noAuth,
+    });
+
+    const expectedResponse = {
+      errors: [
+        {
+          message: 'Login error, please try to sign in again.',
+          code: 401,
+          additionalInfo: 'jwt must be provided',
+        },
+      ],
+      data: null,
+    };
+    expect(response.data).to.be.deep.eq(expectedResponse);
+  });
+
+  it('should refuse users with bad authentication', async () => {
+    const badAuth = {
+      operationName: 'createUserQuery',
+      query: createUserQuery,
+      variables: {
+        userInput: userInput,
+      },
+    };
+
+    const response = await axios({
+      url: endpoint,
+      method: 'post',
+      data: badAuth,
+      headers: {
+        Authorization: createToken(-1),
+      },
+    });
+
+    const expectedResponse = {
+      errors: [
+        {
+          message: 'Login error, please try to sign in again.',
+          code: 401,
+          additionalInfo: 'jwt token has invalid user id',
         },
       ],
       data: null,
