@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import { AppDataSource, clearDB } from '../src/data-source';
 import { User } from '../src/entity/User';
 import { LoginInput } from '../src/schema/interfaces';
-import { hasher, endpoint, defaultUser } from './index';
+import { hashString, endpoint, defaultUser } from './index';
 
 const loginQuery = `
   mutation loginQuery($loginInput: LoginInput!) {
@@ -26,7 +26,7 @@ describe('login mutation tests', async () => {
   before(async () => {
     const userRepo = AppDataSource.getRepository(User);
     const dbUser = { ...loginUser };
-    dbUser.password = hasher(loginUser.password);
+    dbUser.password = hashString(loginUser.password);
     await userRepo.save(dbUser);
   });
 

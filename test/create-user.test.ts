@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import { AppDataSource, clearDB } from '../src/data-source';
 import { User } from '../src/entity/User';
 import { UserInput } from '../src/schema/interfaces';
-import { hasher, endpoint, defaultUser } from './index';
+import { hashString, endpoint, defaultUser } from './index';
 
 const createUserQuery = `mutation createUserQuery ($userInput: UserInput!) { createUser(userData: $userInput) {
     name,
@@ -54,7 +54,7 @@ describe('createUser mutation tests', async () => {
       id: 1,
       name: userInput.name,
       email: userInput.email,
-      password: hasher(userInput.password),
+      password: hashString(userInput.password),
       birthDate: userInput.birthDate,
     };
     expect(response.data).to.be.deep.eq(expectedResponse);

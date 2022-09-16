@@ -4,7 +4,7 @@ import { AppDataSource } from '../data-source';
 import { createHmac } from 'crypto';
 import { CustomError } from '../format-error';
 
-export function hasher(str: string) {
+export function hashString(str: string) {
   const hash = createHmac('sha256', 'internalizing server behavior');
   return hash.update(str).digest('hex');
 }
@@ -49,7 +49,7 @@ export const resolvers = {
       user.name = args.userData.name;
       user.email = args.userData.email;
 
-      user.password = hasher(args.userData.password);
+      user.password = hashString(args.userData.password);
       user.birthDate = args.userData.birthDate;
 
       await validateInput(args.userData);
@@ -62,7 +62,7 @@ export const resolvers = {
 
       const user = await userRepo.findOneBy({
         email: args.loginData.email,
-        password: hasher(args.loginData.password),
+        password: hashString(args.loginData.password),
       });
 
       if (user == null) {
