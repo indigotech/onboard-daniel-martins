@@ -3,8 +3,8 @@ import { expect } from 'chai';
 import { AppDataSource, clearDB } from '../src/data-source';
 import { User } from '../src/entity/User';
 import { UserInput } from '../src/schema/interfaces';
-import { endpoint, defaultUser, createToken } from './index';
-import { hashString } from '../src/schema/resolvers';
+import { endpoint, defaultUser } from './index';
+import { hashString, createToken } from '../src/schema/resolvers';
 
 let userInput: UserInput;
 
