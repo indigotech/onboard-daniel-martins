@@ -11,11 +11,11 @@ let userInput: UserInput;
 const createUserQuery = `
   mutation createUserQuery($userInput: UserInput!) {
     createUser(userData: $userInput) {
-    name
-    email
-    birthDate
-    id
-  }
+      name
+      email
+      birthDate
+      id
+    }
   }
 `;
 const validToken = createToken(1);

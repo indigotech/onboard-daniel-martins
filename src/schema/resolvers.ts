@@ -47,23 +47,43 @@ export function createToken(userID: number, rememberMe = false) {
   return jwt.sign({ userID: userID }, tokenSecret, rememberMe ? { expiresIn: '7d' } : undefined);
 }
 
+export function authenticateToken(token: string) {
+  try {
+    const tokenPayload = jwt.verify(token, tokenSecret) as JWTPayload;
+    if (!tokenPayload.userID || !tokenPayload.iat) {
+      throw new Error('jwt token missing expected fields');
+    }
+    if (tokenPayload.userID <= 0) {
+      throw new Error('jwt token has invalid user id');
+    }
+  } catch (err) {
+    throw new CustomError('Login error, please try to sign in again.', 401, err.message);
+  }
+}
+
 export const resolvers = {
   Query: {
     hello: () => `Hello, Taqtiler!`,
+    async user(_: unknown, args: { userID: number }, context: { token: string }) {
+      authenticateToken(context.token);
+
+      const userRepo = AppDataSource.getRepository(User);
+      const foundUser = await userRepo.findOneBy({ id: args.userID });
+
+      if (foundUser == null) {
+        throw new CustomError(
+          'User not found, please try again.',
+          401,
+          'Searched ID did not correspond to any existing users in database.',
+        );
+      }
+
+      return foundUser;
+    },
   },
   Mutation: {
     async createUser(_: unknown, args: CreateUserInput, context: { token: string }): Promise<UserOutput> {
-      try {
-        const tokenPayload = jwt.verify(context.token, tokenSecret) as JWTPayload;
-        if (!tokenPayload.userID || !tokenPayload.iat) {
-          throw new Error('jwt token missing expected fields');
-        }
-        if (tokenPayload.userID <= 0) {
-          throw new Error('jwt token has invalid user id');
-        }
-      } catch (err) {
-        throw new CustomError('Login error, please try to sign in again.', 401, err.message);
-      }
+      authenticateToken(context.token);
 
       const userRepo = AppDataSource.getRepository(User);
       const user = new User();
