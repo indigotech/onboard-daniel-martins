@@ -71,11 +71,7 @@ describe('createUser mutation tests', async () => {
     expect(await userRepo.findOneBy({ id: 1 })).to.be.deep.eq(expectedEntry);
   });
 
-  it('should refuse short passwords', async () => {
-    userInput.password = 'a1';
-
-    const response = await axios(request);
-
+  describe('Password validation tests', async () => {
     const expectedResponse = {
       errors: [
         {
@@ -85,41 +81,30 @@ describe('createUser mutation tests', async () => {
       ],
       data: null,
     };
-    expect(response.data).to.be.deep.eq(expectedResponse);
-  });
 
-  it('should refuse passwords without numbers', async () => {
-    userInput.password = 'abcdef';
+    it('should refuse short passwords', async () => {
+      userInput.password = 'a1';
 
-    const response = await axios(request);
+      const response = await axios(request);
 
-    const expectedResponse = {
-      errors: [
-        {
-          message: 'Password must be at least 6 characters long. Password must have at least one letter and one digit.',
-          code: 400,
-        },
-      ],
-      data: null,
-    };
-    expect(response.data).to.be.deep.eq(expectedResponse);
-  });
+      expect(response.data).to.be.deep.eq(expectedResponse);
+    });
 
-  it('should refuse passwords without letters', async () => {
-    userInput.password = '123456';
+    it('should refuse passwords without numbers', async () => {
+      userInput.password = 'abcdef';
 
-    const response = await axios(request);
+      const response = await axios(request);
 
-    const expectedResponse = {
-      errors: [
-        {
-          message: 'Password must be at least 6 characters long. Password must have at least one letter and one digit.',
-          code: 400,
-        },
-      ],
-      data: null,
-    };
-    expect(response.data).to.be.deep.eq(expectedResponse);
+      expect(response.data).to.be.deep.eq(expectedResponse);
+    });
+
+    it('should refuse passwords without letters', async () => {
+      userInput.password = '123456';
+
+      const response = await axios(request);
+
+      expect(response.data).to.be.deep.eq(expectedResponse);
+    });
   });
 
   it('should refuse emails already in database', async () => {
@@ -141,19 +126,8 @@ describe('createUser mutation tests', async () => {
 
   it('should refuse emails that are not properly formatted', async () => {
     userInput.email = 'unacceptable.com';
-    const badEmail = {
-      operationName: 'createUserQuery',
-      query: createUserQuery,
-      variables: {
-        userInput: userInput,
-      },
-    };
 
-    const response = await axios({
-      url: endpoint,
-      method: 'post',
-      data: badEmail,
-    });
+    const response = await axios(request);
 
     const expectedResponse = {
       errors: [

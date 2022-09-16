@@ -54,16 +54,8 @@ describe('login mutation tests', async () => {
   });
 
   it('should return logged user data with token back from the server', async () => {
-
     const response = await axios(request);
 
-    const expectedEntry = {
-      id: 1,
-      name: loginUser.name,
-      email: loginUser.email,
-      password: hasher(loginUser.password),
-      birthDate: loginUser.birthDate,
-    };
     const expectedResponse = {
       data: {
         login: {
@@ -73,7 +65,7 @@ describe('login mutation tests', async () => {
             birthDate: loginUser.birthDate,
             id: 1,
           },
-          token: createToken(expectedEntry.id),
+          token: createToken(1),
         },
       },
     };
