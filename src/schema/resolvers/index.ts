@@ -1,7 +1,8 @@
 import { queryResolvers } from './queries';
 import { mutationResolvers } from './mutations';
 
-export * from './helper-functions';
+export * from './validator';
+export * from './crypto.utils';
 export const resolvers = {
   Query: queryResolvers,
   Mutation: mutationResolvers,
