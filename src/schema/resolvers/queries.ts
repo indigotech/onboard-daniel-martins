@@ -10,7 +10,7 @@ export const queryResolvers = {
     authenticateToken(context.token);
 
     const userRepo = AppDataSource.getRepository(User);
-    const foundUser = await userRepo.findOneBy({ id: args.userID });
+    const foundUser = await userRepo.findOne({ where: { id: args.userID }, relations: { addresses: true } });
 
     if (!foundUser) {
       throw new CustomError(
@@ -42,6 +42,7 @@ export const queryResolvers = {
       order: { name: 'ASC' },
       skip: userOffset,
       take: userLimit,
+      relations: { addresses: true },
     });
 
     return {

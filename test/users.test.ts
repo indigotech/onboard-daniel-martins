@@ -15,6 +15,16 @@ const usersQuery = `
         name
         email
         birthDate
+        addresses{
+          id
+          cep
+          street
+          streetNumber
+          complement
+          neighborhood
+          city
+          state
+        }
       }
       total
       usersBefore
@@ -83,6 +93,7 @@ describe('users query tests', async () => {
       order: { name: 'ASC' },
       take: 10,
       select: { id: true, name: true, email: true, birthDate: true },
+      relations: { addresses: true },
     });
     expect(response.data).to.be.deep.eq(expectedResponse);
   });
@@ -99,6 +110,7 @@ describe('users query tests', async () => {
       skip: 18,
       take: 6,
       select: { id: true, name: true, email: true, birthDate: true },
+      relations: { addresses: true },
     });
     expectedResponse.data.users.maxPage = 9;
     expectedResponse.data.users.usersBefore = true;
@@ -118,6 +130,7 @@ describe('users query tests', async () => {
         skip: 45,
         take: 5,
         select: { id: true, name: true, email: true, birthDate: true },
+        relations: { addresses: true },
       }),
       total: 50,
       maxPage: 10,
