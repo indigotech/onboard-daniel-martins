@@ -16,6 +16,14 @@ export interface UserOutput {
   birthDate: string;
 }
 
+export interface UserList {
+  users: UserOutput[];
+  total: number;
+  usersBefore: boolean;
+  usersAfter: boolean;
+  maxPage: number;
+}
+
 export interface LoginUserInput {
   loginData: LoginInput;
   rememberMe: boolean;

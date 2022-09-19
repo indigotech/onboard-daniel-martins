@@ -4,6 +4,7 @@ export const typeDefs = gql`
   type Query {
     hello: String!
     user(userID: Int!): UserOutput
+    users(userMax: Int, page: Int): UserList
   }
 
   input UserInput {
@@ -18,6 +19,14 @@ export const typeDefs = gql`
     name: String!
     email: String!
     birthDate: String!
+  }
+
+  type UserList {
+    users: [UserOutput]!
+    total: Int!
+    usersBefore: Boolean!
+    usersAfter: Boolean!
+    maxPage: Int!
   }
 
   input LoginInput {

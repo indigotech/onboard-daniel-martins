@@ -36,7 +36,7 @@ const request = {
 };
 
 describe('createUser mutation tests', async () => {
-  beforeEach(async () => {
+  beforeEach(() => {
     userInput = { ...defaultUser };
     operation.variables.userInput = userInput;
   });
