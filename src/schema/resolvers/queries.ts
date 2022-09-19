@@ -44,7 +44,7 @@ export const queryResolvers = {
       take: userLimit,
     });
 
-    if (foundUsers == null) {
+    if (foundUsers.length == 0) {
       throw new CustomError('No users found.', 404, 'Database is currently empty, and has no users to return.');
     }
 

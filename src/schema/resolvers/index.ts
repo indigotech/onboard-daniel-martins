@@ -9,7 +9,7 @@ import { mutationResolvers } from './mutations';
 
 export const tokenSecret = 'Understanding how to fly into w@ll5';
 
-export function hasher(str: string) {
+export function hashString(str: string) {
   const hash = createHmac('sha256', 'internalizing server behavior');
   return hash.update(str).digest('hex');
 }

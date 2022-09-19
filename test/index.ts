@@ -13,11 +13,13 @@ export const defaultUser = {
 before(async () => {
   dotenv.config({ path: './test.env' });
   await startServer();
+  await clearDB();
 });
 
 require('./create-user.test');
 require('./login.test');
 require('./user.test');
+require('./users.test');
 
 after(async () => {
   await clearDB();

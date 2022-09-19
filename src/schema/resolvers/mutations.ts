@@ -1,4 +1,4 @@
-import { authenticateToken, hasher, validateInput, createToken } from '.';
+import { authenticateToken, hashString, validateInput, createToken } from '.';
 import { AppDataSource } from '../../data-source';
 import { User } from '../../entity/User';
 import { CustomError } from '../../format-error';
@@ -13,7 +13,7 @@ export const mutationResolvers = {
     user.name = args.userData.name;
     user.email = args.userData.email;
 
-    user.password = hasher(args.userData.password);
+    user.password = hashString(args.userData.password);
     user.birthDate = args.userData.birthDate;
 
     await validateInput(args.userData);
@@ -26,7 +26,7 @@ export const mutationResolvers = {
 
     const user = await userRepo.findOneBy({
       email: args.loginData.email,
-      password: hasher(args.loginData.password),
+      password: hashString(args.loginData.password),
     });
 
     if (user == null) {
