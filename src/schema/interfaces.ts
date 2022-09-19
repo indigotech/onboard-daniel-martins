@@ -18,7 +18,7 @@ export interface UserOutput {
 
 export interface UserList {
   users: UserOutput[];
-  userNum: number;
+  total: number;
   usersBefore: boolean;
   usersAfter: boolean;
   maxPage: number;

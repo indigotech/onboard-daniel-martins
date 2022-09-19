@@ -5,10 +5,10 @@ import { startDB } from './server';
 import * as dotenv from 'dotenv';
 import { hashString } from './schema/resolvers';
 
-export async function seedUsers(userNum = 50) {
+export async function seedUsers(total = 50) {
   const userRepo = AppDataSource.getRepository(User);
 
-  for (let i = 0; i < userNum; i++) {
+  for (let i = 0; i < total; i++) {
     const user = new User();
     user.name = faker.name.firstName() + ' ' + faker.name.lastName();
     user.email = faker.internet.email(user.name.split(' ')[0], user.name.split(' ')[1]);

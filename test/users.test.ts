@@ -16,7 +16,7 @@ const usersQuery = `
         email
         birthDate
       }
-      userNum
+      total
       usersBefore
       usersAfter
       maxPage
@@ -43,7 +43,7 @@ const defaultResponse = {
   data: {
     users: {
       users: undefined,
-      userNum: 50,
+      total: 50,
       usersBefore: false,
       usersAfter: true,
       maxPage: 5,
@@ -119,7 +119,7 @@ describe('users query tests', async () => {
         take: 5,
         select: { id: true, name: true, email: true, birthDate: true },
       }),
-      userNum: 50,
+      total: 50,
       maxPage: 10,
       usersBefore: true,
       usersAfter: false,
@@ -174,7 +174,7 @@ describe('users query tests', async () => {
       data: {
         users: {
           users: [],
-          userNum: 0,
+          total: 0,
           usersBefore: false,
           usersAfter: false,
           maxPage: 0,

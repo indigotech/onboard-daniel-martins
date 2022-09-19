@@ -29,7 +29,7 @@ export const mutationResolvers = {
       password: hashString(args.loginData.password),
     });
 
-    if (user == null) {
+    if (!user) {
       throw new CustomError(
         'User not found, please try again.',
         401,

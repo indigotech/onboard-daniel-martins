@@ -32,9 +32,9 @@ export const queryResolvers = {
       );
     }
     const userRepo = AppDataSource.getRepository(User);
-    const userNum = await userRepo.count();
-    const maxPage = Math.ceil(userNum / args.userMax);
-    const page = args.page ? (args.userMax * (args.page - 1) > userNum ? maxPage : args.page) : 1;
+    const total = await userRepo.count();
+    const maxPage = Math.ceil(total / args.userMax);
+    const page = args.page ? (args.userMax * (args.page - 1) > total ? maxPage : args.page) : 1;
     const userOffset = args.userMax * (page - 1);
     const userLimit = args.userMax ? args.userMax : 20;
 
@@ -46,8 +46,8 @@ export const queryResolvers = {
 
     return {
       users: foundUsers,
-      userNum: userNum,
-      usersAfter: userOffset + userLimit < userNum,
+      total: total,
+      usersAfter: userOffset + userLimit < total,
       usersBefore: userOffset > 0,
       maxPage: maxPage,
     };

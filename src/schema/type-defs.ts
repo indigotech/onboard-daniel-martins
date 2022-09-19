@@ -23,7 +23,7 @@ export const typeDefs = gql`
 
   type UserList {
     users: [UserOutput]!
-    userNum: Int!
+    total: Int!
     usersBefore: Boolean!
     usersAfter: Boolean!
     maxPage: Int!
