@@ -7,6 +7,16 @@ export const typeDefs = gql`
     users(userMax: Int, page: Int): UserList
   }
 
+  type Address {
+    cep: String!
+    street: String!
+    streetNumber: String!
+    complement: String
+    neighborhood: String!
+    city: String!
+    state: String!
+  }
+
   input UserInput {
     name: String!
     email: String!
@@ -19,6 +29,7 @@ export const typeDefs = gql`
     name: String!
     email: String!
     birthDate: String!
+    addresses: [Address]
   }
 
   type UserList {
