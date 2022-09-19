@@ -13,6 +13,16 @@ const userQuery = `
       name
       email
       birthDate
+      addresses{
+        id
+        cep
+        street
+        streetNumber
+        complement
+        neighborhood
+        city
+        state
+      }
     }
   }
 `;

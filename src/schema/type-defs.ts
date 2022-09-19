@@ -8,6 +8,7 @@ export const typeDefs = gql`
   }
 
   type Address {
+    id: Int!
     cep: String!
     street: String!
     streetNumber: String!
