@@ -21,9 +21,11 @@
       "start": "node server.js",
       "test": "mocha --exit -r ts-node/register test/index.ts",
       "build": "tsc --esModuleInterop server.ts",
-      "typeorm": "typeorm-ts-node-commonjs"
+      "typeorm": "typeorm-ts-node-commonjs",
+      "seeds": "ts-node --transpile-only --no-notify --exit-child src/seed-script.ts"
    },
    "devDependencies": {
+      "@faker-js/faker": "7.5.0",
       "@types/chai": "4.3.3",
       "@types/jsonwebtoken": "8.5.9",
       "@types/mocha": "9.1.1",
