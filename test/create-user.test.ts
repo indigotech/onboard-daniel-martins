@@ -11,11 +11,11 @@ let userInput: UserInput;
 const createUserQuery = `
   mutation createUserQuery($userInput: UserInput!) {
     createUser(userData: $userInput) {
-    name
-    email
-    birthDate
-    id
-  }
+      name
+      email
+      birthDate
+      id
+    }
   }
 `;
 const validToken = createToken(1);
@@ -115,7 +115,7 @@ describe('createUser mutation tests', async () => {
       errors: [
         {
           message: 'Email address already in use, please use another one or log in to your account.',
-          code: 400,
+          code: 409,
           additionalInfo: 'Inputted email address is already bound to an existing user in data source.',
         },
       ],
