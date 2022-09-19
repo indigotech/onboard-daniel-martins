@@ -1,6 +1,6 @@
 import { authenticateToken, hashString, validateInput, createToken } from '.';
 import { AppDataSource } from '../../data-source';
-import { User } from '../../entity/User';
+import { Address, User } from '../../entity';
 import { CustomError } from '../../format-error';
 import { CreateUserInput, UserOutput, LoginUserInput, LoginOutput } from '../interfaces';
 
@@ -15,6 +15,7 @@ export const mutationResolvers = {
 
     user.password = hashString(args.userData.password);
     user.birthDate = args.userData.birthDate;
+    user.addresses = args.userData.addresses as Address[];
 
     await validateInput(args.userData);
     await userRepo.save(user);

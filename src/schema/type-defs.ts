@@ -18,11 +18,22 @@ export const typeDefs = gql`
     state: String!
   }
 
+  input AddressInput {
+    cep: String!
+    street: String!
+    streetNumber: String!
+    complement: String
+    neighborhood: String!
+    city: String!
+    state: String!
+  }
+
   input UserInput {
     name: String!
     email: String!
     password: String!
     birthDate: String!
+    addresses: [AddressInput]
   }
 
   type UserOutput {

@@ -1,4 +1,14 @@
-export interface Address {
+export interface AddressInput {
+  cep: string;
+  street: string;
+  streetNumber: string;
+  complement: string;
+  neighborhood: string;
+  city: string;
+  state: string;
+}
+
+export interface AddressOutput {
   id: number;
   cep: string;
   street: string;
@@ -18,6 +28,7 @@ export interface UserInput {
   email: string;
   password: string;
   birthDate: string;
+  addresses: AddressInput[];
 }
 
 export interface UserOutput {
@@ -25,7 +36,7 @@ export interface UserOutput {
   email: string;
   id: number;
   birthDate: string;
-  addresses: Address[];
+  addresses: AddressOutput[];
 }
 
 export interface UserList {

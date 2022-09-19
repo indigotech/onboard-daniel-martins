@@ -64,6 +64,28 @@ describe('user query tests', async () => {
           name: 'Bob sample',
           email: 'bobsemple@gmail.com',
           birthDate: '01-01-1990',
+          addresses: [
+            {
+              id: 1,
+              cep: 'NW1 6XE',
+              street: 'Baker Street',
+              streetNumber: '221',
+              complement: 'b 111',
+              neighborhood: 'Marylebone',
+              city: 'Westminster',
+              state: 'London',
+            },
+            {
+              id: 2,
+              cep: '6JFX+CCW',
+              street: 'Hilmar Rekstens vei',
+              streetNumber: '9170',
+              complement: 'The black building with orange details',
+              neighborhood: 'Longyearbyen',
+              city: 'Longyearbyen',
+              state: 'Svalbard & Jan Mayen',
+            },
+          ],
         },
       },
     };
