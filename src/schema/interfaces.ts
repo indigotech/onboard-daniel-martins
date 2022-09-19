@@ -17,7 +17,7 @@ export interface UserOutput {
 }
 
 export interface UserList {
-  users: [UserOutput];
+  users: UserOutput[];
   userNum: number;
   usersBefore: boolean;
   usersAfter: boolean;

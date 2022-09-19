@@ -12,7 +12,7 @@ export const queryResolvers = {
     const userRepo = AppDataSource.getRepository(User);
     const foundUser = await userRepo.findOneBy({ id: args.userID });
 
-    if (foundUser == null) {
+    if (!foundUser) {
       throw new CustomError(
         'User not found, please try again.',
         401,
@@ -44,12 +44,8 @@ export const queryResolvers = {
       take: userLimit,
     });
 
-    if (foundUsers.length == 0) {
-      throw new CustomError('No users found.', 404, 'Database is currently empty, and has no users to return.');
-    }
-
     return {
-      users: foundUsers as [User],
+      users: foundUsers,
       userNum: userNum,
       usersAfter: userOffset + userLimit < userNum,
       usersBefore: userOffset > 0,

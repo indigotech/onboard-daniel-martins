@@ -112,15 +112,18 @@ describe('users query tests', async () => {
 
     const response = await axios(request);
 
-    expectedResponse.data.users.users = await userRepo.find({
-      order: { name: 'ASC' },
-      skip: 45,
-      take: 5,
-      select: { id: true, name: true, email: true, birthDate: true },
-    });
-    expectedResponse.data.users.maxPage = 10;
-    expectedResponse.data.users.usersBefore = true;
-    expectedResponse.data.users.usersAfter = false;
+    expectedResponse.data.users = {
+      users: await userRepo.find({
+        order: { name: 'ASC' },
+        skip: 45,
+        take: 5,
+        select: { id: true, name: true, email: true, birthDate: true },
+      }),
+      userNum: 50,
+      maxPage: 10,
+      usersBefore: true,
+      usersAfter: false,
+    };
     expect(response.data).to.be.deep.eq(expectedResponse);
   });
 
@@ -162,19 +165,21 @@ describe('users query tests', async () => {
     expect(response.data).to.be.deep.eq(expectedResponse);
   });
 
-  it('should give an error with an empty database', async () => {
+  it('should return empty array with an empty database', async () => {
     await clearDB();
+
     const response = await axios(request);
 
     expectedResponse = {
-      errors: [
-        {
-          message: 'No users found.',
-          code: 404,
-          additionalInfo: 'Database is currently empty, and has no users to return.',
+      data: {
+        users: {
+          users: [],
+          userNum: 0,
+          usersBefore: false,
+          usersAfter: false,
+          maxPage: 0,
         },
-      ],
-      data: { users: null },
+      },
     };
     expect(response.data).to.be.deep.eq(expectedResponse);
   });
