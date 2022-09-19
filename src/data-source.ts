@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
-import { User } from './entity/User';
+import { User, Address } from './entity';
 
 export let AppDataSource: DataSource;
 
@@ -14,12 +14,12 @@ export function dataSourceSetup() {
     database: process.env.DB_NAME,
     synchronize: true,
     logging: false,
-    entities: [User],
+    entities: [User, Address],
     migrations: [],
     subscribers: [],
   });
 }
 
 export async function clearDB() {
-  await AppDataSource.query('TRUNCATE TABLE "user" RESTART IDENTITY');
+  await AppDataSource.query('TRUNCATE TABLE "user" RESTART IDENTITY CASCADE');
 }
